@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global CSS */
+
+html,
+body {
+  @apply font-poppins;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  @apply font-bold;
+}
+
+h1 {
+  @apply text-4xl font-bold;
+}
+
+h2 {
+  @apply text-2xl font-bold;
+}
+
+h3 {
+  @apply text-xl font-bold;
+}
+
+h4 {
+  @apply text-lg font-extrabold;
+}
+
+h5 {
+  @apply text-sm font-extrabold;
+}
