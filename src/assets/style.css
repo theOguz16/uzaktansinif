@@ -37,3 +37,21 @@ h4 {
 h5 {
   @apply text-sm font-extrabold;
 }
+
+/* özel css */
+.vuejs3-datepicker__calendar-topbar {
+  background-color: #7334a6 !important;
+}
+.vuejs3-datepicker__calendar .cell.selected {
+  background-color: #7334a6 !important;
+}
+.vuejs3-datepicker__calendar .cell:hover {
+  border-color: #7334a6 !important;
+}
+.takvim .vuejs3-datepicker__calendar-topbar {
+  background-color: #7334a6 !important;
+}
+
+.vuejs3-datepicker__calendar .cell.selected {
+  background-color: #7334a6 !important;
+}

@@ -1,0 +1,19 @@
+--Uzaktan Sınıf Yapılacaklar--
+--------------------------------------------------------
+(backend)
+Search
+sitede geçirilen süre(yapıldı ama süre sıfırlanıyor listelerken toplam o gün ne kadar aktif oldu onu yazdırırız)
+Öğrenci-Hoca hesaplarının ayrılması (backend)
+Profilde soruları gösterme (backend)
+Login register (backend)
+Çıkış yap (backend)
+LOADER
+------------------------------------------------------------
+(buglar)
+yorum kısmı açıkken yorum yapınca tüm soruların altına yorum yapıyor
+Profili Düzenlede görseller bozuk
+------------------------------------------------------------
+(sonralarda)
+soruları kaydetme(instagram koleksiyon)
+
+
