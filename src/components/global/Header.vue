@@ -12,7 +12,7 @@ import Timer from "../sidebar/Timer.vue";
           <RouterLink to="/">
             <img
               class="w-[13rem]"
-              src="public\image\uzaktansiniflogo.png"
+              src="/image/uzaktansiniflogo.png"
               alt="Logo"
             />
           </RouterLink>
@@ -30,11 +30,13 @@ import Timer from "../sidebar/Timer.vue";
           id="user"
         >
           <div class="flex items-center gap-2">
-            <img
-              src="public\image\person.png"
-              class="w-10 h-10 rounded-[50%] object-cover"
-              alt="user-photo"
-            />
+            <RouterLink to="/profile">
+              <img
+                src="/image/person.png"
+                class="w-10 h-10 rounded-[50%] object-cover"
+                alt="user-photo"
+              />
+            </RouterLink>
             <span class="text-white font-medium text-sm max-sm:hidden"
               >admin</span
             >

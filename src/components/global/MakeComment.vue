@@ -44,6 +44,9 @@
 import { eventBus } from "../../main.js";
 
 export default {
+  props: {
+    soru: Object,
+  },
   data() {
     return {
       yorumList: [],
@@ -66,7 +69,8 @@ export default {
     },
     yorumOlustur() {
       if (this.yorum.commentExplain !== null) {
-        this.yorumList.push({ ...this.yorum });
+        // this.yorumList.push({ ...this.yorum });
+        this.soru.yorumlar.push({ ...this.yorum });
         eventBus.$emit("yorumEklendi", { ...this.yorum });
         this.reset();
       }

@@ -3,6 +3,9 @@ import Yorum from "./Yorum.vue";
 import { eventBus } from "../../main.js";
 
 export default {
+  props: {
+    soru: Object,
+  },
   components: {
     appYorum: Yorum,
   },
@@ -58,12 +61,12 @@ export default {
 };
 </script>
 <template>
-  <appYorum v-for="(yorum, index) in yorumList" :key="index">
+  <appYorum v-for="(yorum, index) in soru.yorumlar" :key="index">
     <div
       :class="{
         'bg-green-100': yorum.greenBg && !yorum.blueBg,
         'bg-body-bg': !yorum.greenBg && yorum.blueBg,
-        'bg-blue-50': yorum.blueBg && !yorum.greenBg,
+        'bg-blue-100': yorum.blueBg && !yorum.greenBg,
       }"
       class="mt-12 bg-body-bg p-4"
     >

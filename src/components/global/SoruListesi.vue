@@ -83,7 +83,7 @@ export default {
         {{ soru.konuListesi }}
       </div>
       <hr />
-      <LikeAndComment></LikeAndComment>
+      <LikeAndComment :soru="soru"></LikeAndComment>
     </div>
   </appSoru>
 </template>

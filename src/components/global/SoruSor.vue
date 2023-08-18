@@ -86,6 +86,7 @@ export default {
         img: null,
         likeCount: 0,
         yorumCount: 0,
+        yorumlar: [],
       },
     };
   },
@@ -108,6 +109,7 @@ export default {
         img: null,
         likeCount: 0,
         yorumCount: 0,
+        yorumlar: [],
       };
     },
   },

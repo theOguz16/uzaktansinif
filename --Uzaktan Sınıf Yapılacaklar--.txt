@@ -10,8 +10,6 @@ Login register (backend)
 LOADER
 ------------------------------------------------------------
 (buglar)
-yorum kısmı açıkken yorum yapınca tüm soruların altına yorum yapıyor
-Profili Düzenlede görseller bozuk
 ------------------------------------------------------------
 (sonralarda)
 soruları kaydetme(instagram koleksiyon)

@@ -6,8 +6,8 @@ export default {
       ayt: null,
       tytKontrol: false,
       aytKontrol: false,
-      tytList: [82, 15, 73, 55],
-      aytList: [22, 15, 73, 55],
+      tytList: [],
+      aytList: [],
     };
   },
   methods: {

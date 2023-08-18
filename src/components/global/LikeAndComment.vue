@@ -3,6 +3,9 @@ import MakeComment from "./MakeComment.vue";
 import YorumListesi from "./YorumListesi.vue";
 
 export default {
+  props: {
+    soru: Object,
+  },
   components: {
     CommentCreate: MakeComment,
     YorumListesi: YorumListesi,
@@ -60,6 +63,6 @@ export default {
       <span class="text-body-color font-bold">{{ this.commentCount }}</span>
     </div>
   </div>
-  <YorumListesi></YorumListesi>
-  <CommentCreate v-if="commentClicked"></CommentCreate>
+  <YorumListesi :soru="soru"></YorumListesi>
+  <CommentCreate :soru="soru" v-if="commentClicked"></CommentCreate>
 </template>
