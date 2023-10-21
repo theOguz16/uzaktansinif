@@ -1,11 +1,3 @@
-<script setup>
-import SoruSor from "../components/global/SoruSor.vue";
-import SoruListesi from "../components/global/SoruListesi.vue";
-import CanliDers from "../components/sidebar/CanliDers.vue";
-import SinifUyeleri from "../components/sidebar/SinifUyeleri.vue";
-import Takvim from "../components/sidebar/Takvim.vue";
-import Kategoriler from "../components/sidebar/Kategoriler.vue";
-</script>
 <template>
   <Header></Header>
   <div
@@ -29,3 +21,25 @@ import Kategoriler from "../components/sidebar/Kategoriler.vue";
     </div>
   </div>
 </template>
+<script>
+import SoruSor from "../components/global/SoruSor.vue";
+import SoruListesi from "../components/global/SoruListesi.vue";
+import CanliDers from "../components/sidebar/CanliDers.vue";
+import SinifUyeleri from "../components/sidebar/SinifUyeleri.vue";
+import Takvim from "../components/sidebar/Takvim.vue";
+import Kategoriler from "../components/sidebar/Kategoriler.vue";
+export default {
+  components: {
+    SoruSor,
+    SoruListesi,
+    CanliDers,
+    SinifUyeleri,
+    Takvim,
+    Kategoriler,
+  },
+  data() {
+    return {};
+  },
+  methods: {},
+};
+</script>

@@ -28,10 +28,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  disabled: {
-    default: false,
-    type: Boolean,
-  },
   required: {
     default: false,
     type: Boolean,
@@ -58,7 +54,6 @@ const props = defineProps({
       :placeholder="placeholder"
       :type="type"
       :value="modelValue"
-      :disabled="disabled"
       @input="(e) => $emit('update:modelValue', e.target.value)"
     />
     <span

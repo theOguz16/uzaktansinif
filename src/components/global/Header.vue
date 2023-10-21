@@ -37,9 +37,9 @@ import Timer from "../sidebar/Timer.vue";
                 alt="user-photo"
               />
             </RouterLink>
-            <span class="text-white font-medium text-sm max-sm:hidden"
-              >admin</span
-            >
+            <span class="text-white font-medium text-sm max-sm:hidden">{{
+              this.user.username
+            }}</span>
             <ProfilSideBar></ProfilSideBar>
           </div>
         </div>
@@ -47,3 +47,20 @@ import Timer from "../sidebar/Timer.vue";
     </div>
   </header>
 </template>
+<script>
+import axiosInstance from "@/lib/axios";
+
+export default {
+  data() {
+    return {
+      user: {},
+    };
+  },
+  methods: {},
+  async mounted() {
+    const result = await axiosInstance.get("http://localhost:3000/profile");
+
+    this.user = result.data.user;
+  },
+};
+</script>

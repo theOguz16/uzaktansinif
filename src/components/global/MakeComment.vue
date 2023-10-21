@@ -6,13 +6,13 @@
       >
         <img
           class="h-24 w-24 text-center mb-2"
-          :src="yorum.img == null ? 'public/image/addimg.png' : yorum.img"
+          :src="yorum.img == null ? 'image/addimg.png' : yorum.img"
         />
         <input
           class="hidden"
           ref="file"
           type="file"
-          requried
+          required
           @change="onChange($event)"
         />
         <button
@@ -28,11 +28,10 @@
         class="my-3"
         placeholder="Yorum..."
         type="text"
-        :required="true"
+        required
       ></InputTextarea>
       <InputButton
         @:click="yorumOlustur"
-        @click="reset"
         class="bg-dark-purple w-full text-center outline-none"
         type="submit"
         text="Yorum Yap"
@@ -42,6 +41,7 @@
 </template>
 <script>
 import { eventBus } from "../../main.js";
+import axios from "axios";
 
 export default {
   props: {
@@ -59,34 +59,69 @@ export default {
         questionCount: 0,
         greenBg: false,
         blueBg: false,
+        yorumlar: [],
       },
+      soruID: null,
     };
   },
   methods: {
+    async createComment() {
+      try {
+        this.soruID = this.soru._id; // Soru kimliğini alın
+        const response = await axios.post(
+          `http://localhost:3000/soru/${this.soruID}/yorum-ekle`,
+          {
+            commentExplain: this.yorum.commentExplain,
+            img: this.yorum.img,
+            likeCount: this.yorum.likeCount,
+            isLiked: this.yorum.isLiked,
+            questionCount: this.yorum.questionCount,
+            isQuestion: this.yorum.isQuestion,
+            blueBg: this.yorum.blueBg,
+            greenBg: this.yorum.greenBg,
+          }
+        );
+
+        this.yorumlar.push(response.data); // Yeni yorumu yorumlar listesine ekleyin
+        // this.reset();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async fetchQuestions() {
+      try {
+        const response = await axios.get("http://localhost:3000/yorumlar");
+        this.yorumlar = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     onChange(e) {
       const file = e.target.files[0];
       this.yorum.img = URL.createObjectURL(file);
     },
     yorumOlustur() {
       if (this.yorum.commentExplain !== null) {
-        // this.yorumList.push({ ...this.yorum });
-        this.soru.yorumlar.push({ ...this.yorum });
-        eventBus.$emit("yorumEklendi", { ...this.yorum });
-        this.reset();
+        eventBus.$emit("yorumEklendi", this.yorum);
+        this.soru.yorumlar.push(this.yorum);
+        // this.reset();
       }
     },
-    reset() {
-      this.yorum = {
-        commentExplain: null,
-        img: null,
-        isLiked: false,
-        isQuestion: false,
-        likeCount: 0,
-        questionCount: 0,
-        greenBg: false,
-        blueBg: false,
-      };
-    },
+    // reset() {
+    //   this.yorum = {
+    //     commentExplain: null,
+    //     img: null,
+    //     isLiked: false,
+    //     isQuestion: false,
+    //     likeCount: 0,
+    //     questionCount: 0,
+    //     greenBg: false,
+    //     blueBg: false,
+    //   };
+    // },
+  },
+  created() {
+    this.fetchQuestions();
   },
 };
 </script>

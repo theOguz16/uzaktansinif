@@ -1,4 +1,32 @@
-<script setup></script>
+<script>
+import axios from "axios";
+
+export default {
+  methods: {
+    async logout() {
+      // Token'ı yerel depodan sil
+      localStorage.removeItem("token");
+
+      // Sunucuya çıkış isteği gönder (isteğe bağlı)
+      try {
+        const response = await axios.post("http://localhost:3000/logout");
+
+        if (response.status === 200) {
+          // Çıkış başarılı
+          console.log("Çıkış başarılı.");
+        } else {
+          console.error("Çıkış sırasında bir hata oluştu.");
+        }
+      } catch (error) {
+        console.error("Çıkış sırasında bir hata oluştu:", error);
+      }
+
+      // Kullanıcıyı giriş sayfasına yönlendir
+      this.$route.push("/login");
+    },
+  },
+};
+</script>
 <template>
   <nav
     class="hidden group-hover:block absolute bg-white w-[200px] rounded-md top-[40px] shadow-md hover:block transition-all duration-300 z-10 max-lg:text-left max-lg:right-[-25px] max-lg:top-[55px]"
@@ -25,6 +53,7 @@
     >
 
     <router-link
+      @click="logout"
       to="/login"
       class="block text-sm font-medium py-3 px-4 hover:text-theme-main duration-300"
       >Çıkış Yap</router-link

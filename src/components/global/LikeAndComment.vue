@@ -1,10 +1,12 @@
 <script>
 import MakeComment from "./MakeComment.vue";
 import YorumListesi from "./YorumListesi.vue";
+import axios from "axios";
 
 export default {
   props: {
     soru: Object,
+    yorum: Object,
   },
   components: {
     CommentCreate: MakeComment,
@@ -12,31 +14,56 @@ export default {
   },
   data() {
     return {
-      commentCount: 0,
-      likeCount: 0,
-      isLiked: false,
+      commentCount: this.soru.yorumCount,
+      likeCount: this.soru.likeCount,
+      isLiked: this.soru.isLiked,
       commentClicked: null,
+      isCommented: this.soru.isCommented,
     };
   },
   methods: {
-    likeCounter() {
-      if (this.isLiked) {
-        parseInt(this.likeCount--);
-        this.isLiked = false;
-      } else {
-        parseInt(this.likeCount++);
-        this.isLiked = true;
+    async soruBegen() {
+      try {
+        const response = await axios.post("http://localhost:3000/soru-begen", {
+          soruBasligi: this.soru.soruBasligi,
+        });
+
+        // Beğeni işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
+        // Örneğin:
+        this.likeCount = response.data.likeCount;
+        this.isLiked = response.data.isLiked;
+
+        console.log(this.isLiked);
+        console.log(this.likeCount);
+      } catch (error) {
+        console.error(error);
       }
     },
+    async yorumCounter() {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/comment-counter",
+          {
+            soruBasligi: this.soru.soruBasligi,
+          }
+        );
+
+        // yorum arttırma işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
+        // Örneğin:
+        this.commentCount = response.data.yorumCount;
+        this.isCommented = response.data.isCommented;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    //frontend icin
     commentCounter() {
       if (this.isCommented) {
-        parseInt(this.commentCount--);
-        this.commentClicked = false;
         this.isCommented = false;
+        this.commentClicked = false;
       } else {
-        parseInt(this.commentCount++);
-        this.commentClicked = true;
         this.isCommented = true;
+        this.commentClicked = true;
       }
     },
   },
@@ -46,23 +73,28 @@ export default {
   <div class="flex items-center justify-end gap-4">
     <div class="flex items-center justify-center flex-col gap-1">
       <fai
-        @click="likeCounter"
+        @click="soruBegen"
         :class="isLiked ? 'text-dark-purple' : ''"
         class="text-body-color text-xl cursor-pointer hover:text-dark-purple transition-all like-icon"
         icon="heart"
       />
-      <span class="text-body-color font-bold">{{ this.likeCount }}</span>
+      <span class="text-body-color font-bold">{{ soru.likeCount }}</span>
     </div>
     <div class="flex items-center justify-center flex-col gap-1">
       <fai
-        @click="commentCounter"
+        @click="yorumCounter"
+        @:click="commentCounter"
         :class="isCommented ? 'text-dark-purple' : ''"
         class="text-body-color text-xl cursor-pointer hover:text-dark-purple transition-all"
         icon="comments"
       />
-      <span class="text-body-color font-bold">{{ this.commentCount }}</span>
+      <span class="text-body-color font-bold">{{ soru.yorumCount }}</span>
     </div>
   </div>
-  <YorumListesi :soru="soru"></YorumListesi>
-  <CommentCreate :soru="soru" v-if="commentClicked"></CommentCreate>
+  <YorumListesi :soru="soru" :yorum="yorum"></YorumListesi>
+  <CommentCreate
+    :soru="soru"
+    :yorum="yorum"
+    v-if="commentClicked"
+  ></CommentCreate>
 </template>

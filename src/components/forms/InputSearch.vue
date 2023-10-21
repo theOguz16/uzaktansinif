@@ -31,7 +31,6 @@ const props = defineProps({
       :placeholder="placeholder"
       :type="type"
       :value="modelValue"
-      :disabled="disabled"
       @input="(e) => $emit('update:modelValue', e.target.value)"
     />
   </div>

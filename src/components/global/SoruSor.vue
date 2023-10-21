@@ -31,7 +31,7 @@ import konuListesi from "@/data/konu.json";
         >
           <img
             class="h-24 w-24 text-center mb-2"
-            :src="soru.img == null ? 'public/image/addimg.png' : soru.img"
+            :src="soru.img == null ? 'image/addimg.png' : soru.img"
           />
           <input
             class="hidden"
@@ -61,8 +61,7 @@ import konuListesi from "@/data/konu.json";
         </div>
         <div class="flex justify-center">
           <InputButton
-            @:click="soruOlustur"
-            @click="reset"
+            @click="soruOlustur"
             class="bg-dark-purple w-full outline-none"
             type="submit"
             text="Soru Gönder"
@@ -73,7 +72,9 @@ import konuListesi from "@/data/konu.json";
   </div>
 </template>
 <script>
-import { eventBus } from "../../main.js";
+//ınput button da bu kod da var @click="reset"
+import { eventBus } from "@/main.js";
+import axios from "axios";
 
 export default {
   data() {
@@ -85,15 +86,32 @@ export default {
         explain: null,
         img: null,
         likeCount: 0,
+        isLiked: false,
+        isCommanted: false,
         yorumCount: 0,
         yorumlar: [],
+        questions: [],
+        username: null,
+        token: null,
       },
     };
   },
+
   methods: {
-    onChange(e) {
-      const file = e.target.files[0];
-      this.soru.img = URL.createObjectURL(file);
+    onChange(event) {
+      let data = new FormData();
+      let file = event.target.files[0];
+
+      data.append("name", "my-file");
+      data.append("file", file);
+
+      let config = {
+        header: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
+      axios.post("/test", data, config).then((response) => {});
     },
 
     soruOlustur() {
@@ -101,17 +119,53 @@ export default {
         eventBus.$emit("soruEklendi", this.soru);
       }
     },
-    reset() {
-      this.soru = {
-        konuListesi: null,
-        title: null,
-        explain: null,
-        img: null,
-        likeCount: 0,
-        yorumCount: 0,
-        yorumlar: [],
-      };
+
+    async createSurvey() {
+      try {
+        const response = await axios.post("http://localhost:3000/soru-ekle", {
+          title: this.soru.title,
+          explain: this.soru.explain,
+          konuListesi: this.soru.konuListesi,
+          img: this.soru.img,
+          likeCount: this.soru.likeCount,
+          isLiked: this.soru.isLiked,
+          yorumCount: this.soru.yorumCount,
+          isCommanted: this.soru.isCommanted,
+          username: this.soru.username,
+          token: this.soru.token,
+        });
+        this.questions.push(response.data);
+
+        // this.reset();
+      } catch (error) {
+        console.error(error);
+      }
     },
+    async fetchQuestions() {
+      try {
+        const response = await axios.get("http://localhost:3000/soru-ekle");
+        this.questions = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    // reset() {
+    //   this.soru = {
+    //     konuListesi: null,
+    //     title: null,
+    //     explain: null,
+    //     img: null,
+    //     likeCount: 0,
+    //      isLiked: false,
+    //     yorumCount: 0,
+    //      isCommanted: false,
+
+    //     yorumlar: [],
+    //   };
+    // },
+  },
+  created() {
+    this.fetchQuestions();
   },
 };
 </script>

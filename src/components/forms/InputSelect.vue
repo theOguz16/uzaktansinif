@@ -33,10 +33,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  disabled: {
-    default: false,
-    type: Boolean,
-  },
   required: {
     default: false,
     type: Boolean,
@@ -58,10 +54,9 @@ const props = defineProps({
         ' py-3 px-4 text-base border-2 rounded-[5px] outline-dark-purple')
       "
       :value="modelValue"
-      :disabled="disabled"
       @input="(e) => $emit('update:modelValue', e.target.value)"
     >
-      <option value="" selected="selected" disabled="disabled" hidden="hidden">
+      <option value="" selected="selected" hidden="hidden">
         {{ defaultOptions }}
       </option>
       <option

@@ -1,4 +1,6 @@
 <script>
+import axiosInstance from "@/lib/axios";
+
 export default {
   data() {
     return {
@@ -8,6 +10,7 @@ export default {
       aytKontrol: false,
       tytList: [],
       aytList: [],
+      user: {},
     };
   },
   methods: {
@@ -38,6 +41,11 @@ export default {
       }
     },
   },
+  async mounted() {
+    const result = await axiosInstance.get("http://localhost:3000/profile");
+
+    this.user = result.data.user;
+  },
 };
 </script>
 <template>
@@ -52,7 +60,9 @@ export default {
           <div class="flex gap-4 justify-center flex-col w-[25%] h-[25%]">
             <div class="flex items-center flex-col gap-1 justify-center">
               <h5 class="text-lg text-theme-primary">TYT Neti</h5>
-              <span class="text-lg font-medium text-text-color">{{ tyt }}</span>
+              <span class="text-lg font-medium text-text-color">{{
+                this.user.tytNet
+              }}</span>
             </div>
             <div
               class="flex flex-col justify-center gap-1 items-center height-[95px]"
@@ -73,7 +83,9 @@ export default {
           <div class="flex gap-4 justify-center flex-col w-[25%] h-[25%]">
             <div class="flex items-center flex-col gap-1 justify-center">
               <h5 class="text-lg text-theme-primary">AYT Neti</h5>
-              <span class="text-lg font-medium text-text-color">{{ ayt }}</span>
+              <span class="text-lg font-medium text-text-color">{{
+                this.user.aytNet
+              }}</span>
             </div>
             <div class="flex flex-col justify-center gap-1 items-center">
               <fai
@@ -95,36 +107,36 @@ export default {
         >
           <div class="p-2 border-2 border-white rounded-[100%] bg-white">
             <img
-              src="public\image\person.png"
+              src="image/person.png"
               class="rounded-[100%] h-32 w-32 object-cover"
             />
           </div>
-          <span id="kullanici-adi" class="text-2xl font-bold text-theme-primary"
-            >admin</span
+          <span
+            id="kullanici-adi"
+            class="text-2xl font-bold text-theme-primary"
+            >{{ this.user.name + " " + this.user.surname }}</span
           >
           <div class="flex gap-2 items-center">
             <span
               id="kullanici-il"
               class="text-base font-medium text-text-color"
-              >Bursa</span
-            ><span
-              id="kullanici-ilce"
-              class="text-base font-medium text-text-color"
-              >Karacabey</span
+              >{{ this.user.city }}</span
             >
           </div>
         </div>
         <div class="col-span-1 flex justify-evenly items-center">
           <div class="flex flex-col items-center gap-2">
             <h5 class="text-lg text-theme-primary">Sorulan Soru</h5>
-            <span class="text-lg font-medium text-text-color">2</span>
+            <span class="text-lg font-medium text-text-color">
+              {{ this.user.sorulanSoru }}</span
+            >
           </div>
           <div class="flex flex-col items-center gap-1">
             <h5 class="text-lg text-theme-primary">Yapılan Yorum</h5>
             <span
               id="takip-edilen-sayisi"
               class="text-lg font-medium text-text-color"
-              >4</span
+              >{{ this.user.yapilanYorum }}</span
             >
           </div>
         </div>

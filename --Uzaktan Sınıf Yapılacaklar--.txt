@@ -1,17 +1,44 @@
 --Uzaktan Sınıf Yapılacaklar--
 --------------------------------------------------------
-(backend)
-Search
-sitede geçirilen süre(yapıldı ama süre sıfırlanıyor listelerken toplam o gün ne kadar aktif oldu onu yazdırırız)
-Öğrenci-Hoca hesaplarının ayrılması (backend)
-Profilde soruları gösterme (backend)
-Login register (backend)
-Çıkış yap (backend)
-LOADER
+
+
 ------------------------------------------------------------
 (buglar)
 ------------------------------------------------------------
 (sonralarda)
 soruları kaydetme(instagram koleksiyon)
 
+
+**genel
+Search
+Öğrenci-Hoca hesaplarının ayrılması (backend)
+kategorilerin linklendirilmesi
+ana sayfadaki user tablosunun linkleri
+çalışma suresini post istegi ile db ye at (sonra onu 1 saat 1 puan orn user tablosuna yazdırmayı unutma)
+profil ayarları sayfası
+
+***soru kısmı
+imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
+sorunun ve yorumun kimin yaptığının verisini al
+
+
+!!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
+
+
+****user
+Profilde soruları gösterme (backend)
+profildeki netler sorulan sorular ve yorumlar
+
+*****odevler
+userlara gore odev getirme
+
+
+user = {
+    ... ,
+
+    Sorular: [
+        soru.id
+    ],
+   
+}
 

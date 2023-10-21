@@ -24,10 +24,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  disabled: {
-    default: false,
-    type: Boolean,
-  },
   onKeyPress: {
     type: Function,
     default: () => {
@@ -59,7 +55,6 @@ const props = defineProps({
       "
       :placeholder="placeholder"
       :value="modelValue"
-      :disabled="disabled"
       @input="(e) => $emit('update:modelValue', e.target.value)"
     />
     <span
