@@ -26,14 +26,18 @@ const UserSchema = new Schema({
   emailAddres: {
     type: String,
   },
-  tytNet: {
-    type: Number,
-    default: 0,
-  },
-  aytNet: {
-    type: Number,
-    default: 0,
-  },
+  tytNet: [
+    {
+      week: Number, // Haftanın numarası gibi bir alan
+      net: Number,
+    },
+  ],
+  aytNet: [
+    {
+      week: Number, // Haftanın numarası gibi bir alan
+      net: Number,
+    },
+  ],
   sorulanSoru: {
     type: Number,
     default: 0,
@@ -45,12 +49,38 @@ const UserSchema = new Schema({
   dateOfBirth: {
     type: Date,
   },
-  Sorular: {
-    type: Array,
-  },
+  Sorular: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      autopopulate: { maxDepth: 1 },
+    },
+  ],
+  Yorumlar: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      autopopulate: { maxDepth: 1 },
+    },
+  ],
   Odevler: {
     type: Array,
   },
 });
+
+// User şemasında bir yöntem ekleyin
+UserSchema.methods.addSoru = function (soruID) {
+  if (!this.Sorular.includes(soruID)) {
+    this.Sorular.push(soruID);
+    return this.save();
+  }
+};
+
+UserSchema.methods.addYorum = function (yorumID) {
+  if (!this.Yorumlar.includes(yorumID)) {
+    this.Yorumlar.push(yorumID);
+    return this.save();
+  }
+};
 
 module.exports = mongoose.model("User", UserSchema);

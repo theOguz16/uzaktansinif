@@ -39,6 +39,12 @@ const YorumSchema = new Schema({
   imageUrl: {
     type: String,
   },
+  username: {
+    type: String,
+  },
+  token: {
+    type: String,
+  },
   yorumlar: [
     {
       type: Schema.Types.ObjectId,

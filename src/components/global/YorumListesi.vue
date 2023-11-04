@@ -2,6 +2,7 @@
 import Yorum from "./Yorum.vue";
 import { eventBus } from "../../main.js";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   props: {
@@ -17,9 +18,28 @@ export default {
       today: "",
       soruID: null,
       yorumID: null,
+      yorumlarWUsername: [],
+      username: null,
     };
   },
   methods: {
+    async usernameBul() {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+
+        // Kullanıcı adını kullanabilirsiniz
+        console.log("Kullanıcı Adı: ", this.username);
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+        console.log("Token bulunamadı.");
+      }
+    },
     async getYorumlarFromServer() {
       try {
         const soruID = this.soru._id; // Soru kimliğini alın
@@ -64,16 +84,41 @@ export default {
         console.error("Yorum ayrıntılarını alma hatası:", error);
       }
     },
+    // async usernameBul() {
+    //   const token = localStorage.getItem("token");
+
+    //   if (token) {
+    //     // Token varsa, çözme işlemine başlayabilirsiniz
+    //     const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+    //     // Token içindeki verilere erişin
+    //     this.username = decodedToken.username;
+
+    //     // Kullanıcı adını kullanabilirsiniz
+    //     console.log("Kullanıcı Adı: ", this.username);
+    //   } else {
+    //     // Token bulunamadı veya localStorage'da saklanmamış
+    //     console.log("Token bulunamadı.");
+    //   }
+    // },
 
     async yorumSil(yorum) {
       try {
-        const yorumID = yorum._id; // Yorumun _id değerini alın
-        console.log(yorumID);
+        const requestData = {
+          username: this.username,
+        };
+
         const response = await axios.delete(
-          `http://localhost:3000/yorumlar/${yorum._id}`
+          `http://localhost:3000/yorumlar/${yorum._id}`,
+          {
+            data: {
+              username: this.username,
+            },
+          }
         );
-        // Başarılı yanıt alındığında, yorumu frontend'den kaldırabilirsiniz.
-        this.yorumList = this.yorumList.filter((item) => item._id !== yorumID);
+
+        // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
+        this.yorumList = this.yorumList.filter((yorum) => yorum !== yorum);
       } catch (error) {
         console.error("Yorum silme hatası:", error);
       }
@@ -115,6 +160,8 @@ export default {
     this.getToday();
   },
   created() {
+    this.usernameBul();
+    // this.usernameBul(); // Kullanıcı adını almak için bu yöntemi çağırın
     //idsine göre yollamam lazım
     eventBus.$on("yorumEklendi", (yorum) => {
       this.yorumList.push(yorum);
@@ -140,7 +187,7 @@ export default {
             alt="person"
             class="w-[8%] rounded-[50%]"
           />
-          <span class="text-body-color font-bold">Admin</span>
+          <span class="text-body-color font-bold">{{ yorum.username }}</span>
           <p class="text-text-color">tarafından</p>
         </div>
         <div id="soru-onay mb-2">

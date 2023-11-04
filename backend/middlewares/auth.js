@@ -24,10 +24,8 @@ module.exports = async (req, res, next) => {
     }
 
     req.user = user;
-    console.log(user);
     next();
   } catch (error) {
-    console.log("error", error);
     return res.status(401).json({
       message: "Giriş başarısız. Geçersiz veya süresi dolmuş token.",
     });

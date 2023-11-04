@@ -42,6 +42,7 @@
 <script>
 import { eventBus } from "../../main.js";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   props: {
@@ -60,12 +61,30 @@ export default {
         greenBg: false,
         blueBg: false,
         yorumlar: [],
+        username: null,
+        token: null,
       },
       soruID: null,
     };
   },
   methods: {
     async createComment() {
+      // Token'ı localStorage'dan alın
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+
+        // Kullanıcı adını kullanabilirsiniz
+        console.log("Kullanıcı Adı:", this.username);
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+        console.log("Token bulunamadı.");
+      }
       try {
         this.soruID = this.soru._id; // Soru kimliğini alın
         const response = await axios.post(
@@ -79,6 +98,8 @@ export default {
             isQuestion: this.yorum.isQuestion,
             blueBg: this.yorum.blueBg,
             greenBg: this.yorum.greenBg,
+            username: this.username,
+            token: localStorage.getItem("token"),
           }
         );
 

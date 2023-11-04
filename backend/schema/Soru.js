@@ -39,6 +39,13 @@ const PostSchema = new Schema({
   imageUrl: {
     type: String,
   },
+  username: {
+    type: String,
+  },
+  token: {
+    type: String,
+  },
+  Sorular: [],
 
   yorumlar: [
     {
@@ -48,6 +55,11 @@ const PostSchema = new Schema({
     },
   ],
 });
+
+// Soru şemasında, bir sorunun kullanıcı adına göre filtrelenmesi işlevi ekleyin
+PostSchema.statics.findByUsername = function (username) {
+  return this.find({ username });
+};
 
 PostSchema.plugin(require("mongoose-autopopulate"));
 

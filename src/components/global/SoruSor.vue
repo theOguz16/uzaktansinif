@@ -75,6 +75,7 @@ import konuListesi from "@/data/konu.json";
 //ınput button da bu kod da var @click="reset"
 import { eventBus } from "@/main.js";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   data() {
@@ -121,6 +122,22 @@ export default {
     },
 
     async createSurvey() {
+      // Token'ı localStorage'dan alın
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+
+        // Kullanıcı adını kullanabilirsiniz
+        console.log("Kullanıcı Adı:", this.username);
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+        console.log("Token bulunamadı.");
+      }
       try {
         const response = await axios.post("http://localhost:3000/soru-ekle", {
           title: this.soru.title,
@@ -131,8 +148,8 @@ export default {
           isLiked: this.soru.isLiked,
           yorumCount: this.soru.yorumCount,
           isCommanted: this.soru.isCommanted,
-          username: this.soru.username,
-          token: this.soru.token,
+          username: this.username,
+          token: localStorage.getItem("token"),
         });
         this.questions.push(response.data);
 

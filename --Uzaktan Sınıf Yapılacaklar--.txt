@@ -19,14 +19,14 @@ profil ayarları sayfası
 
 ***soru kısmı
 imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
-sorunun ve yorumun kimin yaptığının verisini al
+yorumların emojileri
 
 
 !!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
 
 
 ****user
-Profilde soruları gösterme (backend)
+Profilde soruları gösterme (backend) -> bu yapıldı fakat soruya ait yorumları alma + silinme hatası
 profildeki netler sorulan sorular ve yorumlar
 
 *****odevler
@@ -41,4 +41,25 @@ user = {
     ],
    
 }
+
+Sıralama
+Profilde soruları gösterme (backend) -> bu yapıldı fakat soruya ait yorumları alma + silinme hatası (yorumları getireyim mi yunus abiye sor)
+profildeki netler 
+userlara gore odev getirme
+Search
+Öğrenci-Hoca hesaplarının ayrılması (backend)
+kategorilerin linklendirilmesi
+profil ayarları sayfası
+ana sayfadaki user tablosunun linkleri
+çalışma suresini post istegi ile db ye at (sonra onu 1 saat 1 puan orn user tablosuna yazdırmayı unutma)
+imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
+yorumların emojileri
+!!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
+
+not
+soruların silinmesini sor onra da yorumları profilde göstereyim mi
+
+buglar
+frontdda soru ve yorumları silince db de soruları ve yorumları sil
+
 

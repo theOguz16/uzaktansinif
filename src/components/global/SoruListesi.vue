@@ -4,6 +4,7 @@ import { eventBus } from "@/main.js";
 import Soru from "@/components/global/Soru.vue";
 import axios from "axios";
 import axiosInstance from "@/lib/axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   components: {
@@ -15,13 +16,32 @@ export default {
       soruList: [],
       today: "",
       questions: [],
+      username: null,
     };
   },
   methods: {
+    async usernameBul() {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+
+        // Kullanıcı adını kullanabilirsiniz
+        console.log("Kullanıcı Adı: ", this.username);
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+        console.log("Token bulunamadı.");
+      }
+    },
     async getPostsFromServer() {
       try {
         const response = await axios.get("http://localhost:3000/sorular");
         this.soruList = response.data;
+
         console.log("Sorular başarıyla alındı");
       } catch (error) {
         console.error("sorulist" + error);
@@ -34,9 +54,20 @@ export default {
     },
     async soruSil(itemToDelete) {
       try {
+        const requestData = {
+          username: this.username,
+          // Diğer gerekli verileri de ekleyebilirsiniz
+        };
+
         const response = await axios.delete(
-          `http://localhost:3000/sorular/${itemToDelete._id}`
+          `http://localhost:3000/sorular/${itemToDelete._id}`,
+          {
+            data: {
+              username: this.username,
+            },
+          }
         );
+
         // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.soruList = this.soruList.filter((soru) => soru !== itemToDelete);
       } catch (error) {
@@ -46,6 +77,7 @@ export default {
   },
 
   created() {
+    this.usernameBul(); // Kullanıcı adını almak için bu yöntemi çağırın
     eventBus.$on("soruEklendi", (soru) => {
       this.soruList.push(soru);
     });
@@ -74,7 +106,7 @@ export default {
             alt="person"
             class="w-[8%] rounded-[50%]"
           />
-          <span class="text-body-color font-bold">admin</span>
+          <span class="text-body-color font-bold">{{ soru.username }}</span>
           <p class="text-text-color">tarafından</p>
         </div>
         <div>

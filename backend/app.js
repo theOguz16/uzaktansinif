@@ -20,12 +20,30 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get("/profile", middlewareAuth, function (req, res) {
+app.get("/profile", middlewareAuth, async function (req, res) {
   // const ödev = Odev.find({ userId: req.user._id });
   return res.json({
     user: req.user,
     // ödevleri: ödev,
   });
+});
+
+app.get("/profile/sorular", middlewareAuth, async function (req, res) {
+  try {
+    // Kullanıcının sorduğu soruları alın, yalnızca soruları almak için projeksiyon kullanın
+    console.log("user", req.user);
+    const sorular = await Soru.find(
+      { username: req.user.username },
+      { yorumlar: 0 }
+    );
+
+    return res.json({
+      user: req.user,
+      sorular,
+    });
+  } catch (error) {
+    res.status(500).json({ hata: "Sorular alınırken bir hata oluştu." });
+  }
 });
 
 // Örnek özel bir rotaya erişim (test)
@@ -107,7 +125,6 @@ app.post("/login", async (req, res) => {
 
   // Kullanıcı kimlik doğrulama işlemini çağırın
   const user = await User.findOne({ username });
-  console.log("user", user);
 
   if (user.password !== password) {
     // Kimlik doğrulama başarısızsa hata mesajını gönderin
@@ -123,7 +140,7 @@ app.post("/login", async (req, res) => {
     return res.json({
       message: "Kimlik doğrulama başarılı.",
       user: user,
-      token,
+      token: token,
     });
   }
 });
@@ -234,7 +251,8 @@ app.post("/soru-ekle", async (req, res) => {
       isLiked: req.body.isLiked,
       yorumCount: req.body.yorumCount,
       isCommanted: req.body.isCommanted,
-
+      username: req.body.username,
+      token: req.body.token, // Kullanıcının token'ını ekleyin
       yorumlar: [
         // {
         //   type: Schema.Types.ObjectId,
@@ -243,12 +261,20 @@ app.post("/soru-ekle", async (req, res) => {
       ],
     });
 
-    const oturumKimligi = req.body.token;
-    const kullaniciAdi = req.body.username;
-    console.log(oturumKimligi, kullaniciAdi);
+    // const oturumKimligi = req.body.token;
+    // const kullaniciAdi = req.body.username;
+    // console.log(oturumKimligi, kullaniciAdi);
 
     //  Soruyu veritabanına kaydedin
     await yeniSoru.save();
+
+    // Bu kod kullanıcının sorularına ekler
+    const user = await User.findOne({ username: req.body.username });
+    user.sorulanSoru++;
+
+    if (user) {
+      user.addSoru(yeniSoru._id);
+    }
 
     res.status(201).json({ mesaj: "Soru başarıyla kaydedildi." });
   } catch (error) {
@@ -331,6 +357,14 @@ app.get("/sorular", async (req, res) => {
     // Veritabanından tüm soruları çekin
     const sorular = await Soru.find({});
     res.status(200).json(sorular);
+
+    const sorularWUsername = sorular.filter((soru) => ({
+      ...soru._doc,
+      username: soru.username,
+    }));
+
+    // Kullanıcının adına göre tüm soruları bulun
+    // console.log("sorularwidth" + sorularWUsername);
   } catch (error) {
     console.error(error);
     res.status(500).json({ hata: "Soruları alma sırasında bir hata oluştu." });
@@ -356,6 +390,12 @@ app.get("/soru/:soruID", async (req, res) => {
 app.delete("/sorular/:soruID", async (req, res) => {
   try {
     const soruID = req.params.soruID;
+    // const { username } = req.body;
+    // const username = req.body.username;
+
+    const user = await User.findOne({ username: req.body.username });
+    user.sorulanSoru--;
+    await user.save();
 
     // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
     const silinenSoru = await Soru.findByIdAndDelete(soruID);
@@ -366,6 +406,15 @@ app.delete("/sorular/:soruID", async (req, res) => {
     // Bağlantılı yorumları silebilirsiniz
     for (const yorumID of baglantiliYorum) {
       await Yorum.findByIdAndDelete(yorumID);
+    }
+
+    // Eğer soru kullanıcının sahip olduğu bir soru ise, silinmesine izin verin
+    if (req.username === req.user.username) {
+      // Soruyu veritabanından silin
+      await Soru.findByIdAndDelete(soruID);
+      return res.json({ mesaj: "Soru başarıyla silindi." });
+    } else {
+      return res.status(403).json({ hata: "Bu soruyu silme izniniz yok." });
     }
 
     res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
@@ -389,8 +438,17 @@ app.post("/soru/:soruID/yorum-ekle", async (req, res) => {
       blueBg: req.body.blueBg,
       greenBg: req.body.greenBg,
       yorumlar: [],
+      username: req.body.username,
+      token: req.body.token,
     });
     await yeniYorum.save();
+
+    const user = await User.findOne({ username: req.body.username });
+    user.yapilanYorum++;
+
+    if (user) {
+      user.addYorum(yeniYorum._id);
+    }
 
     // Yeni yorumun kimliğini alın
     const yorumID = yeniYorum._id;
@@ -425,6 +483,11 @@ app.get("/yorumlar", async (req, res) => {
   try {
     const yorumlar = await Yorum.find();
     res.status(200).json(yorumlar);
+
+    const yorumlarWUsername = yorumlar.filter((yorum) => ({
+      ...yorum._doc,
+      username: yorum.username,
+    }));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -450,6 +513,12 @@ app.delete("/yorumlar/:yorumID", async (req, res) => {
     const yorumID = req.params.yorumID;
     console.log(yorumID);
 
+    const user = await User.findOne({ username: req.body.username });
+    console.log("yapilanYorum ---" + user.yapilanYorum);
+    user.yapilanYorum--;
+    console.log("yapilanYorum new" + user.yapilanYorum);
+    await user.save();
+
     // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
     await Yorum.findByIdAndDelete(yorumID);
 
@@ -457,6 +526,117 @@ app.delete("/yorumlar/:yorumID", async (req, res) => {
   } catch (error) {
     console.error("yorum silme hatası:", error);
     res.status(500).json({ error: "Soru silinemedi." });
+  }
+});
+//TYT netleri
+app.post("/users/:userId/tyt-net", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { week, net } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+    user.tytNet.push({ week, net });
+    await user.save();
+
+    res.json(user.tytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Kullanıcının belirli bir haftadaki TYT netini getirmek için bir GET endpoint'i
+app.get("/users/:userId/tyt-net/:week", async (req, res) => {
+  try {
+    const { userId, week } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    const tytNet = user.tytNet.find(
+      (entry) => entry.week === parseInt(week, 10)
+    );
+    if (!tytNet) {
+      return res.status(404).json({ error: "Net bulunamadı" });
+    }
+
+    res.json(tytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Kullanıcının tüm TYT netlerini getirmek için bir GET endpoint'i
+app.get("/users/:userId/tyt-net", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    res.json(user.tytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//AYT netleri
+app.post("/users/:userId/ayt-net", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { week, net } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+    user.aytNet.push({ week, net });
+    await user.save();
+
+    res.json(user.aytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Kullanıcının belirli bir haftadaki AYT netini getirmek için bir GET endpoint'i
+app.get("/users/:userId/ayt-net/:week", async (req, res) => {
+  try {
+    const { userId, week } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    const aytNet = user.aytNet.find(
+      (entry) => entry.week === parseInt(week, 10)
+    );
+    if (!aytNet) {
+      return res.status(404).json({ error: "Net bulunamadı" });
+    }
+
+    res.json(aytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Kullanıcının tüm AYT netlerini getirmek için bir GET endpoint'i
+app.get("/users/:userId/ayt-net", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    res.json(user.aytNet);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
