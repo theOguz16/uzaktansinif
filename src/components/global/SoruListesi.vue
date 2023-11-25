@@ -17,6 +17,7 @@ export default {
       today: "",
       questions: [],
       username: null,
+      user: {},
     };
   },
   methods: {
@@ -67,6 +68,8 @@ export default {
             },
           }
         );
+
+        this.user.sorulanSoru--;
 
         // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.soruList = this.soruList.filter((soru) => soru !== itemToDelete);

@@ -117,6 +117,8 @@ export default {
           }
         );
 
+        this.user.sorulanSoru--;
+
         // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.yorumList = this.yorumList.filter((yorum) => yorum !== yorum);
       } catch (error) {

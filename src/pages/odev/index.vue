@@ -3,10 +3,14 @@ import konuListesi from "@/data/konu.json";
 import kitapListesi from "@/data/kitaplar.json";
 import axios from "axios";
 import { eventBus } from "@/main.js";
+import jwt_decode from "jwt-decode";
+import axiosInstance from "@/lib/axios";
 
 export default {
   data() {
     return {
+      user: {},
+      usernameList: [],
       konuListesi: konuListesi,
       kitapListesi: kitapListesi,
       odevListe: [],
@@ -15,19 +19,45 @@ export default {
         date: "",
         konu: "",
         kitap: "",
+        username: "",
+        token: "",
       },
     };
   },
   methods: {
     async createOdev() {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Eğer kullanıcı admin değilse, token içindeki verilere erişin
+        if (decodedToken.username !== "admin") {
+          this.odevEkle.username = decodedToken.username;
+          // Kullanıcı adını kullanabilirsiniz
+          console.log("Kullanıcı Adı:", this.odevEkle.username);
+        }
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+        console.log("Token bulunamadı.");
+      }
+
       try {
-        const response = await axios.post("http://localhost:3000/odev", {
-          text: this.odevEkle.text,
-          date: this.odevEkle.date,
-          konu: this.odevEkle.konu,
-          kitapAdi: this.odevEkle.kitap,
-        });
+        const response = await axiosInstance.post(
+          "http://localhost:3000/odev",
+          {
+            username: this.odevEkle.username,
+            token: localStorage.getItem("token"),
+            text: this.odevEkle.text,
+            date: this.odevEkle.date,
+            konu: this.odevEkle.konu,
+            kitapAdi: this.odevEkle.kitap,
+          }
+        );
+
         this.odevListe.push(response.data);
+
         // this.reset();
       } catch (error) {
         console.error(error);
@@ -44,19 +74,23 @@ export default {
         console.error("odev silme hatası:", error);
       }
     },
-    async getOdevlerFromServer() {
-      try {
-        const response = await axios.get("http://localhost:3000/odev");
-        this.odevListe = response.data;
-        console.log("ödevler başarıyla alındı");
-      } catch (error) {
-        console.error("odevlist" + error);
-      }
-    },
+
     async fetchOdevler() {
       try {
-        const response = await axios.get("http://localhost:3000/odev");
+        const response = await axiosInstance.get("http://localhost:3000/odev");
+        // this.odevListe = response.data;
         this.odevListe = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async usernameListCreate() {
+      try {
+        const response = await axiosInstance.get(
+          "http://localhost:3000/odev/username"
+        );
+        this.usernameList = response.data;
+        // console.log(this.usernameList);
       } catch (error) {
         console.error(error);
       }
@@ -65,16 +99,24 @@ export default {
       if (this.odevEkle.text !== null) {
         eventBus.$emit("odevEklendi", this.odevEkle);
       }
-      this.getOdevlerFromServer();
+      // this.getOdevlerFromServer();
     },
   },
   created() {
-    this.fetchOdevler();
+    this.fetchOdevler(), this.usernameListCreate();
   },
-  mounted() {
+  async mounted() {
     setInterval(() => {
-      this.getOdevlerFromServer();
+      this.fetchOdevler(), this.usernameListCreate();
     }, 10000);
+  },
+  async mounted() {
+    const result = await axiosInstance.get("http://localhost:3000/canliders");
+
+    this.user = result.data.user;
+
+    this.fetchOdevler();
+    this.usernameListCreate();
   },
 };
 </script>
@@ -94,6 +136,16 @@ export default {
         class="flex items-center justify-center gap-2 bg-transparent flex-col"
       >
         <div class="flex gap-4 items-center justify-center max-sm:flex-col">
+          <InputSelect
+            v-if="this.user?.role === 'Teacher'"
+            class="text-text-color outline-dark-purple"
+            :items="this.usernameList"
+            itemKey="value"
+            itemValue="username"
+            defaultOptions="Username List"
+            v-model="odevEkle.username"
+          >
+          </InputSelect>
           <InputSelect
             class="text-text-color outline-dark-purple"
             :items="kitapListesi"

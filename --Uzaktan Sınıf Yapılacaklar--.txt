@@ -1,65 +1,24 @@
---Uzaktan Sınıf Yapılacaklar--
---------------------------------------------------------
 
 
-------------------------------------------------------------
-(buglar)
-------------------------------------------------------------
-(sonralarda)
-soruları kaydetme(instagram koleksiyon)
-
-
-**genel
 Search
-Öğrenci-Hoca hesaplarının ayrılması (backend)
-kategorilerin linklendirilmesi
-ana sayfadaki user tablosunun linkleri
-çalışma suresini post istegi ile db ye at (sonra onu 1 saat 1 puan orn user tablosuna yazdırmayı unutma)
+Öğrenci-Hoca hesaplarının ayrılması (backend) --> metinleri vb düzenleme kaldı
 profil ayarları sayfası
-
-***soru kısmı
-imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
-yorumların emojileri
-
-
-!!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
-
-
-****user
-Profilde soruları gösterme (backend) -> bu yapıldı fakat soruya ait yorumları alma + silinme hatası
-profildeki netler sorulan sorular ve yorumlar
-
-*****odevler
-userlara gore odev getirme
-
-
-user = {
-    ... ,
-
-    Sorular: [
-        soru.id
-    ],
-   
-}
-
+ana sayfadaki user tablosunun linkleri
 Sıralama
-Profilde soruları gösterme (backend) -> bu yapıldı fakat soruya ait yorumları alma + silinme hatası (yorumları getireyim mi yunus abiye sor)
-profildeki netler 
-userlara gore odev getirme
-Search
-Öğrenci-Hoca hesaplarının ayrılması (backend)
-kategorilerin linklendirilmesi
-profil ayarları sayfası
-ana sayfadaki user tablosunun linkleri
 çalışma suresini post istegi ile db ye at (sonra onu 1 saat 1 puan orn user tablosuna yazdırmayı unutma)
 imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
 yorumların emojileri
 !!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
 
 not
-soruların silinmesini sor onra da yorumları profilde göstereyim mi
+profili bitirip kategoriyi güncelle
+sitede geçirilen süreyi hesaplamayı sor
 
 buglar
 frontdda soru ve yorumları silince db de soruları ve yorumları sil
+sorulan soru - ye düşüyo
+odevler oluşunca otomatik yenilensin
+sorulan soru profilde silinince azalmıyor
+
 
 

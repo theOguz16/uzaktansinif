@@ -172,7 +172,7 @@ export default {
 
         localStorage.setItem("token", response.data.token);
 
-        this.$route.push("/login");
+        this.$router.push("/profile");
         // this.reset();
       } catch (error) {
         console.error(error);

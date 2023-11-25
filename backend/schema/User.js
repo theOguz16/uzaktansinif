@@ -63,8 +63,16 @@ const UserSchema = new Schema({
       autopopulate: { maxDepth: 1 },
     },
   ],
-  Odevler: {
-    type: Array,
+  Odevler: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      autopopulate: { maxDepth: 1 },
+    },
+  ],
+  role: {
+    type: String,
+    default: "Student",
   },
 });
 
@@ -72,6 +80,13 @@ const UserSchema = new Schema({
 UserSchema.methods.addSoru = function (soruID) {
   if (!this.Sorular.includes(soruID)) {
     this.Sorular.push(soruID);
+    return this.save();
+  }
+};
+
+UserSchema.methods.addOdev = function (odevID) {
+  if (!this.Odevler.includes(odevID)) {
+    this.Odevler.push(odevID);
     return this.save();
   }
 };

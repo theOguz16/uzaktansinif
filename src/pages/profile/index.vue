@@ -13,6 +13,7 @@ export default {
       aytList: [],
       user: {},
       sorular: [],
+      odevler: [],
     };
   },
   methods: {
@@ -109,9 +110,21 @@ export default {
         }
       }
     },
-
+    async getOdevler() {
+      try {
+        //ödevleri çekmece
+        const { data } = await axiosInstance.get(
+          `http://localhost:3000/profile/odevler`
+        );
+        this.odevler = data.odevler;
+        console.log(this.odevler);
+      } catch (error) {
+        console.error("odevler gelmedi", error);
+      }
+    },
     async getProfileData() {
       try {
+        //netleri cekmece
         const tytResponse = await axiosInstance.get(
           `http://localhost:3000/users/${this.user._id}/tyt-net`
         );
@@ -122,6 +135,7 @@ export default {
         );
         this.aytList = aytResponse.data;
 
+        //soruları çekmece
         const { data } = await axiosInstance.get(
           `http://localhost:3000/profile/sorular`
         );
@@ -134,32 +148,36 @@ export default {
       const date = new Date();
       this.today = date.toLocaleDateString();
     },
+
     async soruSil(itemToDelete) {
       try {
         const response = await axios.delete(
-          `http://localhost:3000/sorular/${itemToDelete._id}`
-        );
-        // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
-        this.sorular = this.sorular.filter((soru) => soru !== itemToDelete);
-
-        // Aynı zamanda kullanıcının "Sorular" listesinden de bu soruyu kaldırın
-        const userResponse = await axios.delete(
           `http://localhost:3000/profile/sorular/${itemToDelete._id}`
         );
 
-        // Kullanıcının "Sorular" listesinden başarılı bir şekilde kaldırıldığında, bu değişiklikleri de senkronize edin.
-        // Örneğin, this.user.sorular dizisini güncelleyebilirsiniz.
-        this.user.sorular = this.user.sorular.filter(
-          (soru) => soru._id !== itemToDelete._id
-        );
+        this.user.sorulanSoru--;
+
+        this.sorular = this.sorular.filter((soru) => soru !== itemToDelete);
       } catch (error) {
         console.error("Soru silme hatası:", error);
+      }
+    },
+
+    async removeTodo(itemToDelete) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:3000/profile/odevler/${itemToDelete._id}`
+        );
+
+        this.odevler = this.odevler.filter((odev) => odev !== itemToDelete);
+      } catch (error) {
+        console.error("ödev silme hatası:", error);
       }
     },
   },
   async mounted() {
     setInterval(() => {
-      this.getProfileData(); // Belirli aralıklarla verileri güncelle
+      this.getProfileData(), this.getOdevler(); // Belirli aralıklarla verileri güncelle
     }, 10000); // Örnek: 1 dakikada bir güncelle --> websocket veya loader kullan
     this.getToday();
 
@@ -169,6 +187,7 @@ export default {
     console.log(this.user + "user");
 
     this.getProfileData();
+    this.getOdevler();
   },
 };
 </script>
@@ -351,8 +370,41 @@ export default {
         >
           {{ soru.konu }}
         </div>
-        <!-- <LikeAndComment :soru="soru"></LikeAndComment> -->
       </div>
+    </div>
+    <div class="mt-20">
+      <ul>
+        <li class="bg-white w-full p-2 mb-4" v-for="odev in odevler">
+          <div class="flex items-center justify-center gap-2">
+            <div
+              class="flex gap-4 p-4 justify-center items-center text-center max-sm:flex-col max-sm:items-start max-sm:justify-start max-sm:text-left"
+            >
+              <div class="flex flex-col gap-1 p-2 max-sm:p-0">
+                <span>Ödev Açıklaması</span>
+                <span class="text-text-color">{{ odev.odevAciklamasi }}</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span>Kitap Adı</span>
+                <span class="text-text-color">{{ odev.kitapAdi }}</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span>Konu Adı</span>
+                <span class="text-text-color">{{ odev.konu }}</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span>Ödev Teslim Tarihi</span>
+                <span class="text-text-color">{{ odev.odevTarihi }}</span>
+              </div>
+            </div>
+          </div>
+          <button
+            class="bg-dark-pink text-white rounded p-2 w-full text-center"
+            @click="removeTodo(odev)"
+          >
+            Sil
+          </button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>

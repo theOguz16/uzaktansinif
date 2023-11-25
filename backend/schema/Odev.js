@@ -20,6 +20,13 @@ const OdevSchema = new Schema({
   complated: {
     type: Boolean,
   },
+  token: {
+    type: String,
+  },
+  username: {
+    type: String,
+  },
+
   userId: {
     type: String, // veya ObjectId olarak ayarlayabilirsiniz
   },
@@ -28,5 +35,9 @@ const OdevSchema = new Schema({
     default: Date.now(),
   },
 });
+
+OdevSchema.statics.findByUsername = function (username) {
+  return this.find({ username });
+};
 
 module.exports = mongoose.model("Odev", OdevSchema);

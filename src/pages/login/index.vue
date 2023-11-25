@@ -68,6 +68,14 @@ export default {
               text="Giriş Yap"
             ></InputButton>
           </div>
+          <div id="register" class="mt-2">
+            <p class="text-sm">
+              Henüz kayıt olmadın mı ?
+              <router-link class="text-dark-pink" to="/register"
+                >Kayıt Ol!</router-link
+              >
+            </p>
+          </div>
         </form>
       </div>
     </div>

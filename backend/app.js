@@ -20,17 +20,22 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get("/profile", middlewareAuth, async function (req, res) {
-  // const ödev = Odev.find({ userId: req.user._id });
+app.get("/canliders", middlewareAuth, async function (req, res) {
   return res.json({
     user: req.user,
-    // ödevleri: ödev,
+  });
+});
+
+app.get("/profile", middlewareAuth, async function (req, res) {
+  // const odevler = Odev.find({ userId: req.user._id });
+  return res.json({
+    user: req.user,
+    // odevler: req.user.odevler,
   });
 });
 
 app.get("/profile/sorular", middlewareAuth, async function (req, res) {
   try {
-    // Kullanıcının sorduğu soruları alın, yalnızca soruları almak için projeksiyon kullanın
     console.log("user", req.user);
     const sorular = await Soru.find(
       { username: req.user.username },
@@ -43,6 +48,48 @@ app.get("/profile/sorular", middlewareAuth, async function (req, res) {
     });
   } catch (error) {
     res.status(500).json({ hata: "Sorular alınırken bir hata oluştu." });
+  }
+});
+app.delete("/profile/sorular/:soruID", async function (req, res) {
+  try {
+    const soruID = req.params.soruID;
+    console.log("soruid:", soruID);
+
+    await Soru.findByIdAndDelete(soruID);
+
+    res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+  } catch (error) {
+    console.error("profilde soru silme hatası:", error);
+    res.status(500).json({ error: "soru silinemedi." });
+  }
+});
+
+app.get("/profile/odevler", middlewareAuth, async function (req, res) {
+  try {
+    // Kullanıcının ödevlerini alın
+    console.log("user", req.user);
+    const odevler = await Odev.find({ username: req.user.username });
+
+    return res.json({
+      user: req.user,
+      odevler,
+    });
+  } catch (error) {
+    res.status(500).json({ hata: "Sorular alınırken bir hata oluştu." });
+  }
+});
+
+app.delete("/profile/odevler/:soruID", async function (req, res) {
+  try {
+    const odevID = req.params.soruID;
+    console.log("odevID:", odevID);
+
+    await Odev.findByIdAndDelete(odevID);
+
+    res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+  } catch (error) {
+    console.error("profilde ödev silme hatası:", error);
+    res.status(500).json({ error: "ödev silinemedi." });
   }
 });
 
@@ -156,7 +203,7 @@ app.post("/logout", (req, res) => {
 
 //Ödevler
 
-app.post("/odev", async (req, res) => {
+app.post("/odev", middlewareAuth, async (req, res) => {
   try {
     //  Gelen verileri kullanarak yeni bir ödev  oluşturun
     const newOdev = new Odev({
@@ -165,10 +212,18 @@ app.post("/odev", async (req, res) => {
       konu: req.body.konu,
       kitapAdi: req.body.kitapAdi,
       complated: req.body.complated,
+      username: req.body.username,
+      token: req.body.token,
     });
 
     //  ödevi'ı veritabanına kaydedin
     await newOdev.save();
+
+    const user = await User.findOne({ username: req.body.username });
+
+    if (user) {
+      user.addOdev(newOdev._id);
+    }
 
     res.status(201).json({ mesaj: "odev başarıyla kaydedildi." });
   } catch (error) {
@@ -179,8 +234,23 @@ app.post("/odev", async (req, res) => {
 
 app.get("/odev", middlewareAuth, async (req, res) => {
   try {
-    const odevler = await Odev.find();
+    const username = req.user.username;
+    const odevler = await Odev.find({ username: username });
+
+    if (!odevler) {
+      return res.status(404).json({ msg: "ödevler bulunamadı" });
+    }
+
     res.status(200).json(odevler);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/odev/username", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -200,9 +270,18 @@ app.delete("/odev/:odevID", async (req, res) => {
 });
 
 //Register
-app.post("/register", async (req, res) => {
+// Middleware: Kullanıcı rolünü ayarla
+function setRoleToTeacherIfAdmin(req, res, next) {
+  if (req.body.username === "admin") {
+    req.body.role = "Teacher";
+  }
+  next();
+}
+
+// Middleware'ı "/register" endpoint'i ile birleştirin
+app.post("/register", setRoleToTeacherIfAdmin, async (req, res) => {
   try {
-    //  Gelen verileri kullanarak yeni bir user  oluşturun
+    // Gelen verileri kullanarak yeni bir user oluşturun
     const newUser = new User({
       username: req.body.username,
       name: req.body.name,
@@ -212,12 +291,13 @@ app.post("/register", async (req, res) => {
       gender: req.body.gender,
       emailAddres: req.body.emailAddres,
       password: req.body.password,
+      role: req.body.role || "Student", // Eğer role belirtilmediyse "Student" olarak ayarla
     });
 
-    //  User'ı veritabanına kaydedin
+    // User'ı veritabanına kaydedin
     await newUser.save();
 
-    //Kullanıcıyı kimlik doğrulama için kullanacağınız bir JWT token oluşturun
+    // Kullanıcıyı kimlik doğrulama için kullanacağınız bir JWT token oluşturun
     const token = jwt.sign({ username: newUser.username }, "gizli_anahtar");
 
     res.status(201).json({
@@ -395,6 +475,9 @@ app.delete("/sorular/:soruID", async (req, res) => {
 
     const user = await User.findOne({ username: req.body.username });
     user.sorulanSoru--;
+
+    user.Sorular.pull(soruID);
+
     await user.save();
 
     // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
@@ -517,6 +600,9 @@ app.delete("/yorumlar/:yorumID", async (req, res) => {
     console.log("yapilanYorum ---" + user.yapilanYorum);
     user.yapilanYorum--;
     console.log("yapilanYorum new" + user.yapilanYorum);
+
+    user.Yorumlar.pull(yorumID);
+
     await user.save();
 
     // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
@@ -637,6 +723,62 @@ app.get("/users/:userId/ayt-net", async (req, res) => {
     res.json(user.aytNet);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+//soru Konuları filtreleme
+
+app.get("/sorular/konular/:konu", async (req, res) => {
+  try {
+    const konu = req.params.konu;
+    console.log(req.params.konu, "paramsKonu");
+    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    const sorular = await Soru.find({ konu: konu });
+    res.status(200).json(sorular);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ hata: "Soruları alma sırasında bir hata oluştu." });
+  }
+});
+
+//sinif uyeleri
+
+app.get("/sinif-uyeleri/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    console.log(req.params.username, "paramsUSer");
+    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    const users = await User.find({ username: username });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ hata: "Useri alma sırasında bir hata oluştu." });
+  }
+});
+
+app.get("/odevler/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    console.log(req.params.username, "paramsUSer");
+    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    const users = await Odev.find({ username: username });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ hata: "Ödevi alma sırasında bir hata oluştu." });
+  }
+});
+
+app.get("/sorular/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    console.log(req.params.username, "paramsUSer");
+    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    const users = await Soru.find({ username: username });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ hata: "Soru alma sırasında bir hata oluştu." });
   }
 });
 

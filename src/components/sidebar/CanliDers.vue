@@ -1,7 +1,57 @@
-<script setup></script>
+<script>
+import axiosInstance from "@/lib/axios";
+
+export default {
+  data() {
+    return {
+      isHovered: false,
+      isVisible: false,
+      link: "",
+      user: {},
+    };
+  },
+  methods: {
+    onMouseEnter() {
+      this.isHovered = true;
+    },
+    onMouseLeave() {
+      this.isHovered = false;
+    },
+    toggleVisibility() {
+      this.isVisible = !this.isVisible;
+    },
+    logMessage() {
+      console.log(this.link);
+    },
+  },
+
+  async mounted() {
+    const result = await axiosInstance.get("http://localhost:3000/canliders");
+
+    this.user = result.data.user;
+    console.log(this.user);
+  },
+};
+</script>
 <template>
   <div>
     <button
+      v-if="this.user?.role === 'Student'"
+      @click="toggleVisibility"
+      v-on:click="logMessage"
+      class="bg-dark-purple text-center text-white px-4 py-3 rounded-[4px] w-full mb-3 outline-none"
+    >
+      Derse Katıl
+      <fai
+        class="ml-2"
+        icon="info"
+        @:mouseenter="onMouseEnter"
+        @:mouseleave="onMouseLeave"
+      ></fai>
+    </button>
+
+    <button
+      v-if="this.user?.role === 'Teacher'"
       @click="toggleVisibility"
       v-on:click="logMessage"
       class="bg-dark-purple text-center text-white px-4 py-3 rounded-[4px] w-full mb-3 outline-none"
@@ -39,28 +89,3 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      isHovered: false,
-      isVisible: false,
-      link: "",
-    };
-  },
-  methods: {
-    onMouseEnter() {
-      this.isHovered = true;
-    },
-    onMouseLeave() {
-      this.isHovered = false;
-    },
-    toggleVisibility() {
-      this.isVisible = !this.isVisible;
-    },
-    logMessage() {
-      console.log(this.link);
-    },
-  },
-};
-</script>
