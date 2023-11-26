@@ -37,9 +37,10 @@ import Timer from "../sidebar/Timer.vue";
                 alt="user-photo"
               />
             </RouterLink>
-            <span class="text-white font-medium text-sm max-sm:hidden">{{
-              this.user.username
-            }}</span>
+            <span class="text-white font-medium text-sm max-sm:hidden">
+              <span class="mr-[3px]">{{ this.user.name }}</span>
+              <span>{{ this.user.surname }}</span>
+            </span>
             <ProfilSideBar></ProfilSideBar>
           </div>
         </div>

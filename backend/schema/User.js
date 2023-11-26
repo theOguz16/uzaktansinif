@@ -74,6 +74,10 @@ const UserSchema = new Schema({
     type: String,
     default: "Student",
   },
+  time: {
+    type: Number,
+    default: 0,
+  },
 });
 
 // User şemasında bir yöntem ekleyin

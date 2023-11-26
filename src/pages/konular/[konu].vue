@@ -22,14 +22,14 @@ export default {
   data() {
     return {
       sorular: [],
-      konu: "Basit-Makinalar",
+      konu: "",
     };
   },
   methods: {
     async getKategoriler() {
       try {
         const response = await axios.get(
-          `http://localhost:3000/sorular/konular/${this.konu}`
+          `http://localhost:3000/sorular/konular/${this.$route.params.konu}`
         );
         this.sorular = response.data;
       } catch (error) {

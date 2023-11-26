@@ -42,14 +42,13 @@ export default {
 };
 </script>
 <template>
+  <Header></Header>
   <div class="container">
     <ul class="flex flex-col bg-white rounded-[5px]">
-      <RouterLink :to="`/calismasureleri`">
-        <span
-          class="font-bold text-sm text-theme-primary border-b-2 py-6 block text-center"
-          >EN ÇOK ÇALIŞAN SINIF UYELERİ</span
-        >
-      </RouterLink>
+      <span
+        class="font-bold text-sm text-theme-primary border-b-2 py-6 block text-center"
+        >EN ÇOK ÇALIŞAN SINIF UYELERİ</span
+      >
       <li v-for="user in users" class="border-b-2 px-6 py-6">
         <RouterLink
           class="items-center font-bold text-sm text-theme-primary transition-all hover:text-dark-pink flex gap-4"

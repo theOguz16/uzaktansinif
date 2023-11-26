@@ -1,43 +1,58 @@
 <template>
   <div class="flex justify-end">
-    <p class="text-sm text-white">Süre: {{ time }} saniye</p>
+    <p class="text-sm text-white">
+      Süre: <span>{{ formatTime(time) }}</span>
+    </p>
   </div>
 </template>
 
 <script>
-export default {
-  // data() {
-  //   return {
-  //     startTime: localStorage.getItem("item"),
-  //     elapsedTime: 0,
-  //     timerInterval: null,
-  //   };
-  // },
-  // created() {
-  //   this.startTime = Date.now();
-  //   this.timerInterval = setInterval(this.updateElapsedTime, 1000);
-  // },
-  // methods: {
-  //   updateElapsedTime() {
-  //     this.elapsedTime = Math.floor((Date.now() - this.startTime) / 1000);
-  //     localStorage.setItem("time", this.elapsedTime);
-  //   },
-  // },
-  // beforeDestroy() {
-  //   // localStorage.removeItem("time");
-  // },
+import axiosInstance from "@/lib/axios";
+import axios from "axios";
 
+export default {
   data() {
     return {
-      time: localStorage.getItem("time") ?? 0,
+      user: {},
+      time: parseInt(localStorage.getItem("time")) || 0,
     };
   },
+  methods: {
+    formatTime() {
+      const hours = Math.floor(this.time / 3600);
+      const minutes = Math.floor((this.time % 3600) / 60);
+      const remainingSeconds = this.time % 60;
 
-  mounted() {
+      return `${this.pad(hours)}:${this.pad(minutes)}:${this.pad(
+        remainingSeconds
+      )}`;
+    },
+    pad(value) {
+      return value.toString().padStart(2, "0");
+    },
+    sendPostRequest() {
+      axios
+        .post("http://localhost:3000/user/updateTime", {
+          userId: this.user._id, // veya kullanıcı kimliğinizi nasıl tanımlıyorsanız ona göre
+          newTime: this.user.time,
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+  },
+
+  async mounted() {
     setInterval(() => {
       this.time++;
-      localStorage.setItem("time", this.time);
+      localStorage.setItem("time", this.time.toString());
+      this.user.time = this.time;
+      this.sendPostRequest();
     }, 1000);
+
+    const result = await axiosInstance.get("http://localhost:3000/profile");
+
+    this.user = result.data.user;
   },
 };
 </script>

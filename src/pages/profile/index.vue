@@ -196,6 +196,7 @@ export default {
   <!-- Kullanıcının Sorduğu Sorular -->
 
   <div class="container mt-12">
+    {{ time }}
     <div class="w-full">
       <div class="h-[300px] bg-slate-300 border-lg shadow-lg"></div>
       <div

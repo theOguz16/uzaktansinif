@@ -318,6 +318,18 @@ app.get("/register", async (req, res) => {
   }
 });
 
+app.get("/register/time", async (req, res) => {
+  try {
+    // Kullanıcıları 'time' alanına göre sıralayarak getir
+    const users = await User.find().sort({ time: -1 });
+
+    // Sıralanmış kullanıcıları JSON olarak gönder
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 //Soru Ekleme
 app.post("/soru-ekle", async (req, res) => {
   try {
@@ -731,8 +743,7 @@ app.get("/users/:userId/ayt-net", async (req, res) => {
 app.get("/sorular/konular/:konu", async (req, res) => {
   try {
     const konu = req.params.konu;
-    console.log(req.params.konu, "paramsKonu");
-    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    // Veritabanından konuya göre filtrelenmiş konuları çekin
     const sorular = await Soru.find({ konu: konu });
     res.status(200).json(sorular);
   } catch (error) {
@@ -746,8 +757,7 @@ app.get("/sorular/konular/:konu", async (req, res) => {
 app.get("/sinif-uyeleri/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    console.log(req.params.username, "paramsUSer");
-    // Veritabanından konuya göre filtrelenmiş soruları çekin
+    // Veritabanından konuya göre filtrelenmiş userlari çekin
     const users = await User.find({ username: username });
     res.status(200).json(users);
   } catch (error) {
@@ -779,6 +789,27 @@ app.get("/sorular/:username", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ hata: "Soru alma sırasında bir hata oluştu." });
+  }
+});
+
+app.post("/user/updateTime", async (req, res) => {
+  const userId = req.body.userId;
+  const newTime = req.body.newTime;
+
+  try {
+    // Mongoose'de findByIdAndUpdate Promis tabanlı olduğu için 'await' kullanabilirsiniz
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { time: newTime },
+      { new: true }
+    );
+
+    // Güncellenmiş kullanıcıyı kullanabilirsiniz
+    console.log("User time updated:", updatedUser);
+    res.json({ message: "User time updated successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 

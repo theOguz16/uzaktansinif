@@ -1,18 +1,12 @@
 
-
-Search
 Öğrenci-Hoca hesaplarının ayrılması (backend) --> metinleri vb düzenleme kaldı
-profil ayarları sayfası
-ana sayfadaki user tablosunun linkleri
-Sıralama
-çalışma suresini post istegi ile db ye at (sonra onu 1 saat 1 puan orn user tablosuna yazdırmayı unutma)
+Search
 imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
 yorumların emojileri
 !!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
+hata mesajları
 
 not
-profili bitirip kategoriyi güncelle
-sitede geçirilen süreyi hesaplamayı sor
 
 buglar
 frontdda soru ve yorumları silince db de soruları ve yorumları sil
@@ -20,5 +14,8 @@ sorulan soru - ye düşüyo
 odevler oluşunca otomatik yenilensin
 sorulan soru profilde silinince azalmıyor
 
+//extra
+profil ayarları sayfası
+kaydetmeler
 
 
