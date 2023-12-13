@@ -157,7 +157,7 @@ export default {
           </div>
           <div>
             <div id="soru-tarih">
-              <span class="text-text-color">{{ this.today }}</span>
+              <span class="text-text-color">{{ soru.createdAt }}</span>
             </div>
           </div>
         </div>

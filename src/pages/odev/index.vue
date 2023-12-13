@@ -5,6 +5,7 @@ import axios from "axios";
 import { eventBus } from "@/main.js";
 import jwt_decode from "jwt-decode";
 import axiosInstance from "@/lib/axios";
+import box from "@/store/box.js";
 
 export default {
   data() {
@@ -55,11 +56,14 @@ export default {
             kitapAdi: this.odevEkle.kitap,
           }
         );
+        box.addSuccess("Tebrikler", "Ödev Oluşturma İşlemi Başarılı!");
 
         this.odevListe.push(response.data);
+        this.fetchOdevler();
 
         // this.reset();
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
         console.error(error);
       }
     },
@@ -70,7 +74,10 @@ export default {
         );
 
         this.odevListe = this.odevListe.filter((odev) => odev !== itemToDelete);
+        box.addSuccess("Tebrikler", "Ödev Silme İşlemi Başarılı!");
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error("odev silme hatası:", error);
       }
     },

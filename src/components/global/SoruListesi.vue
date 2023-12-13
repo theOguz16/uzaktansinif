@@ -5,6 +5,8 @@ import Soru from "@/components/global/Soru.vue";
 import axios from "axios";
 import axiosInstance from "@/lib/axios";
 import jwt_decode from "jwt-decode";
+import box from "@/store/box.js";
+import Loader from "@/components/global/Loader.vue";
 
 export default {
   components: {
@@ -44,6 +46,7 @@ export default {
         this.soruList = response.data;
 
         console.log("Sorular başarıyla alındı");
+        loader.value(true);
       } catch (error) {
         console.error("sorulist" + error);
       }
@@ -68,12 +71,16 @@ export default {
             },
           }
         );
+        box.addSuccess("Tebrikler", "Soru Silme İşlemi Başarılı!");
 
         this.user.sorulanSoru--;
 
         // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.soruList = this.soruList.filter((soru) => soru !== itemToDelete);
+        box.addSuccess("Tebrikler", "Soru Silme İşlemi Başarılı!");
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error("Soru silme hatası:", error);
       }
     },
@@ -121,7 +128,7 @@ export default {
             </div>
           </div>
           <div id="soru-tarih">
-            <span class="text-text-color">{{ this.today }}</span>
+            <span class="text-text-color">{{ soru.createdAt }}</span>
           </div>
         </div>
       </div>
@@ -145,7 +152,8 @@ export default {
       <div
         class="p-2 rounded text-white bg-dark-pink w-[23%] text-center max-sm:w-full"
       >
-        {{ soru.konu }}
+        <!-- {{ soru.konu }} -->
+        <RouterLink :to="`/konular/${soru.konu}`">{{ soru.konu }}</RouterLink>
       </div>
       <hr />
       <LikeAndComment :soru="soru"></LikeAndComment>

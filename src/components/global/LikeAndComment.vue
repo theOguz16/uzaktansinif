@@ -2,6 +2,7 @@
 import MakeComment from "./MakeComment.vue";
 import YorumListesi from "./YorumListesi.vue";
 import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   props: {
@@ -32,10 +33,10 @@ export default {
         // Örneğin:
         this.likeCount = response.data.likeCount;
         this.isLiked = response.data.isLiked;
-
-        console.log(this.isLiked);
-        console.log(this.likeCount);
+        box.addSuccess("Tebrikler", "Soru Beğenme İşlemi Başarılı!");
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error(error);
       }
     },
@@ -66,6 +67,16 @@ export default {
         this.commentClicked = true;
       }
     },
+    likeCounter(soru) {
+      soru.isLiked = !soru.isLiked;
+      if (soru.isLiked) {
+        parseInt(soru.likeCount++);
+        soru.isLiked = true;
+      } else {
+        parseInt(soru.likeCount--);
+        soru.isLiked = false;
+      }
+    },
   },
 };
 </script>
@@ -91,7 +102,7 @@ export default {
       <span class="text-body-color font-bold">{{ soru.yorumCount }}</span>
     </div>
   </div>
-  <YorumListesi :soru="soru" :yorum="yorum"></YorumListesi>
+  <YorumListesi :soru="soru" :yorum="yorum"> </YorumListesi>
   <CommentCreate
     :soru="soru"
     :yorum="yorum"

@@ -127,6 +127,7 @@ const genderList = {
 <script>
 import { eventBus } from "@/main.js";
 import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   data() {
@@ -172,9 +173,12 @@ export default {
 
         localStorage.setItem("token", response.data.token);
 
+        box.addSuccess("Tebrikler", "Kayıt Olma Başarılı!");
+
         this.$router.push("/profile");
         // this.reset();
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
         console.error(error);
       }
     },

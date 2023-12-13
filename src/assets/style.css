@@ -38,6 +38,34 @@ h5 {
   @apply text-sm font-extrabold;
 }
 
+/* Response message */
+.response-message-wrapper {
+  @apply flex flex-col gap-4 fixed right-0 top-24;
+}
+.response-message {
+  @apply pl-2 pr-6 py-2 bg-white border-l-4  drop-shadow-md flex items-center gap-2 min-w-[310px] w-fit;
+}
+
+.response-message .icon-box {
+  @apply w-10 h-10 rounded-full flex items-center justify-center;
+}
+
+.response-error {
+  @apply border-l-4 border-l-red-500;
+}
+
+.response-message .icon-box.error {
+  @apply bg-red-500;
+}
+
+.response-success {
+  @apply border-l-4 border-l-green-500;
+}
+
+.response-message .icon-box.success {
+  @apply bg-green-500;
+}
+
 /* özel css */
 .vuejs3-datepicker__calendar-topbar {
   background-color: #7334a6 !important;

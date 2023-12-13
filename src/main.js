@@ -6,6 +6,7 @@ export const eventBus = new Vue();
 
 //css
 import "./assets/style.css";
+import "./assets/effect.css";
 
 // Components
 import InputText from "./components/forms/InputText.vue";

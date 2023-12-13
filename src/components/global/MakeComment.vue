@@ -43,6 +43,7 @@
 import { eventBus } from "../../main.js";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import box from "@/store/box.js";
 
 export default {
   props: {
@@ -104,8 +105,12 @@ export default {
         );
 
         this.yorumlar.push(response.data); // Yeni yorumu yorumlar listesine ekleyin
+        box.addSuccess("Tebrikler", "Yorum Yapma İşlemi Başarılı!");
+
         // this.reset();
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error(error);
       }
     },

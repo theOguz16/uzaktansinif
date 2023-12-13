@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
 const app = express();
@@ -5,6 +7,8 @@ const bodyParser = require("body-parser");
 const port = 3000;
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+
+console.log(process.env.PORT, "port");
 
 const middlewareAuth = require("./middlewares/auth");
 
@@ -50,19 +54,59 @@ app.get("/profile/sorular", middlewareAuth, async function (req, res) {
     res.status(500).json({ hata: "Sorular alınırken bir hata oluştu." });
   }
 });
-app.delete("/profile/sorular/:soruID", async function (req, res) {
-  try {
-    const soruID = req.params.soruID;
-    console.log("soruid:", soruID);
+app.delete(
+  "/profile/sorular/:soruID",
+  middlewareAuth,
+  async function (req, res) {
+    // try {
+    //   const soruID = req.params.soruID;
+    //   console.log("soruid:", soruID);
+    //   await Soru.findByIdAndDelete(soruID);
+    //   res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+    // } catch (error) {
+    //   console.error("profilde soru silme hatası:", error);
+    //   res.status(500).json({ error: "soru silinemedi." });
+    // }
 
-    await Soru.findByIdAndDelete(soruID);
+    try {
+      const soruID = req.params.soruID;
+      // const { username } = req.body;
+      // const username = req.body.username;
 
-    res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
-  } catch (error) {
-    console.error("profilde soru silme hatası:", error);
-    res.status(500).json({ error: "soru silinemedi." });
+      const user = await User.findOne({ username: req.user.username });
+      user.sorulanSoru--;
+
+      user.Sorular.pull(soruID);
+
+      await user.save();
+
+      // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
+      const silinenSoru = await Soru.findByIdAndDelete(soruID);
+
+      // Silinen sorunun bağlantılı yorumlarını alın
+      const baglantiliYorum = silinenSoru.yorumlar;
+
+      // Bağlantılı yorumları silebilirsiniz
+      for (const yorumID of baglantiliYorum) {
+        await Yorum.findByIdAndDelete(yorumID);
+      }
+
+      // Eğer soru kullanıcının sahip olduğu bir soru ise, silinmesine izin verin
+      if (req.username === req.user.username) {
+        // Soruyu veritabanından silin
+        await Soru.findByIdAndDelete(soruID);
+        return res.json({ mesaj: "Soru başarıyla silindi." });
+      } else {
+        return res.status(403).json({ hata: "Bu soruyu silme izniniz yok." });
+      }
+
+      res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+    } catch (error) {
+      console.error("Soru silme hatası:", error);
+      res.status(500).json({ error: "Soru silinemedi." });
+    }
   }
-});
+);
 
 app.get("/profile/odevler", middlewareAuth, async function (req, res) {
   try {
@@ -135,6 +179,7 @@ const Soru = require("./schema/Soru.js");
 const User = require("./schema/User.js");
 const Yorum = require("./schema/Yorum.js");
 const Odev = require("./schema/Odev.js");
+const Link = require("./schema/Link.js");
 
 //img
 const multer = require("multer"); //dosya kaydetmek icin
@@ -170,13 +215,20 @@ db.once("open", () => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  // Kullanıcı kimlik doğrulama işlemini çağırın
-  const user = await User.findOne({ username });
+  try {
+    // Kullanıcı kimlik doğrulama işlemini çağırın
+    const user = await User.findOne({ username });
 
-  if (user.password !== password) {
-    // Kimlik doğrulama başarısızsa hata mesajını gönderin
-    return res.status(401).json({ message: "Kimlik doğrulama başarısız." });
-  } else {
+    if (!user) {
+      // Kullanıcı bulunamazsa hata mesajını gönderin
+      return res.status(401).json({ message: "Kullanıcı bulunamadı." });
+    }
+
+    if (user.password !== password) {
+      // Şifre yanlışsa hata mesajını gönderin
+      return res.status(401).json({ message: "Kimlik doğrulama başarısız." });
+    }
+
     // Kimlik doğrulama başarılı ise kullanıcı bilgilerini ve token'ı döndürün
     const token = jwt.sign({ username }, secretKey, {
       expiresIn: "1h",
@@ -189,6 +241,9 @@ app.post("/login", async (req, res) => {
       user: user,
       token: token,
     });
+  } catch (error) {
+    console.error("Bir hata oluştu:", error);
+    return res.status(500).json({ message: "Sunucu hatası." });
   }
 });
 
@@ -573,6 +628,60 @@ app.get("/soru/:soruID/yorumlar", async (req, res) => {
   }
 });
 
+app.post("/yorum-begen", async (req, res) => {
+  const commentExplain = req.body.commentExplain;
+  try {
+    const ilgiliYorum = await Yorum.findOne({ commentExplain: commentExplain });
+
+    if (ilgiliYorum) {
+      if (ilgiliYorum.isLiked) {
+        ilgiliYorum.likeCount--;
+        ilgiliYorum.isLiked = false;
+      } else {
+        ilgiliYorum.likeCount++;
+        ilgiliYorum.isLiked = true;
+      }
+
+      await ilgiliYorum.save();
+      res.status(200).json(ilgiliYorum);
+    } else {
+      res.status(404).json({ hata: "Soru bulunamadı." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      hata: "Soru beğenme sırasında bir hata oluştu.",
+    });
+  }
+});
+
+app.post("/question-begen", async (req, res) => {
+  const commentExplain = req.body.commentExplain;
+  try {
+    const ilgiliYorum = await Yorum.findOne({ commentExplain: commentExplain });
+
+    if (ilgiliYorum) {
+      if (ilgiliYorum.isQuestion) {
+        ilgiliYorum.questionCount--;
+        ilgiliYorum.isQuestion = false;
+      } else {
+        ilgiliYorum.questionCount++;
+        ilgiliYorum.isQuestion = true;
+      }
+
+      await ilgiliYorum.save();
+      res.status(200).json(ilgiliYorum);
+    } else {
+      res.status(404).json({ hata: "Soru bulunamadı." });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      hata: "Soru beğenme sırasında bir hata oluştu.",
+    });
+  }
+});
+
 //backendde yorumlara bakma
 app.get("/yorumlar", async (req, res) => {
   try {
@@ -617,7 +726,7 @@ app.delete("/yorumlar/:yorumID", async (req, res) => {
 
     await user.save();
 
-    // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
+    // MongoDB'den yorumu silmek için gerekli sorguyu çalıştırın
     await Yorum.findByIdAndDelete(yorumID);
 
     res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
@@ -810,6 +919,68 @@ app.post("/user/updateTime", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+//CanliDers Link
+
+// POST isteği ile link oluşturma veya güncelleme
+app.post("/api/link", async (req, res) => {
+  try {
+    //  Gelen verileri kullanarak yeni bir ödev  oluşturun
+    const newLink = new Link({
+      link: req.body.link,
+    });
+
+    //  ödevi'ı veritabanına kaydedin
+    await newLink.save();
+
+    console.log(newLink);
+    res.status(201).json({ mesaj: "odev başarıyla kaydedildi." });
+  } catch (error) {
+    console.error("odev kaydetme hatası:", error);
+    res.status(500).json({ hata: "odev kaydedilirken bir hata oluştu." });
+  }
+});
+
+// GET isteği ile linki getirme
+app.get("/api/link", async (req, res) => {
+  try {
+    const linkDocument = await Link.find({}).sort({ _id: -1 }).limit(1);
+
+    if (linkDocument && linkDocument.length > 0) {
+      res.status(200).send(linkDocument[0]);
+    } else {
+      res.status(404).send("Link bulunamadı");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Bir hata oluştu.");
+  }
+});
+
+app.post("/search", async (req, res) => {
+  try {
+    const searchText = req.body.searchText;
+
+    const result = await Soru.find({ soruAciklamasi: searchText });
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("islem basarisiz hatası:", error);
+    res.status(500).json({ hata: "islem olurken bir hata oluştu." });
+  }
+});
+
+app.get("/search/:search", async (req, res) => {
+  try {
+    const search = req.params.search;
+    // Veritabanından searche göre filtrelenmiş konuları çekin
+    const sorular = await Soru.find({ soruAciklamasi: search });
+    res.status(200).json(sorular);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ hata: "Soruları alma sırasında bir hata oluştu." });
   }
 });
 

@@ -1,18 +1,18 @@
 
-Öğrenci-Hoca hesaplarının ayrılması (backend) --> metinleri vb düzenleme kaldı
-Search
+
 imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
-yorumların emojileri
 !!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
-hata mesajları
+Loader nasıl kullanılıyor anlamadım
 
 not
+mobil tasarımı geliştir
 
 buglar
-frontdda soru ve yorumları silince db de soruları ve yorumları sil
-sorulan soru - ye düşüyo
-odevler oluşunca otomatik yenilensin
-sorulan soru profilde silinince azalmıyor
+frontdda soru silinince yorumu kalıyor backendde onu da sil
+2. ye aynı hesaptan yorum yapınca sorunun yorum değeri 0 oluyor
+begeni 1 kere beğeniliyor farklı tarayıcılardan da
+database keyini sakla secretKeyi env ile
+
 
 //extra
 profil ayarları sayfası

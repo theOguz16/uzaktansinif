@@ -1,6 +1,7 @@
 <script>
 import axiosInstance from "@/lib/axios";
 import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   data() {
@@ -29,8 +30,11 @@ export default {
             }
           );
           this.tytList.push(this.tyt);
+          box.addSuccess("Tebrikler", "TYT Netinizi Ekleme İşlemi Başarılı!");
+
           this.tyt = ""; // Input alanını sıfırla
         } catch (error) {
+          box.addError("Üzgünüm", "Bir Hata Oluştu!");
           console.error("TYT net kaydetme hatası:", error);
         }
       }
@@ -48,8 +52,10 @@ export default {
             }
           );
           this.aytList.push(this.ayt);
+          box.addSuccess("Tebrikler", "AYT Netinizi Ekleme İşlemi Başarılı!");
           this.ayt = ""; // Input alanını sıfırla
         } catch (error) {
+          box.addError("Üzgünüm", "Bir Hata Oluştu!");
           console.error("AYT net kaydetme hatası:", error);
         }
       }
@@ -151,14 +157,16 @@ export default {
 
     async soruSil(itemToDelete) {
       try {
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `http://localhost:3000/profile/sorular/${itemToDelete._id}`
         );
 
-        this.user.sorulanSoru--;
+        this.getProfileData();
 
         this.sorular = this.sorular.filter((soru) => soru !== itemToDelete);
+        box.addSuccess("Tebrikler", "Soru Silme İşlemi Başarılı!");
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
         console.error("Soru silme hatası:", error);
       }
     },
@@ -170,7 +178,9 @@ export default {
         );
 
         this.odevler = this.odevler.filter((odev) => odev !== itemToDelete);
+        box.addSuccess("Tebrikler", "Ödev Silme İşlemi Başarılı!");
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
         console.error("ödev silme hatası:", error);
       }
     },
@@ -345,7 +355,7 @@ export default {
               </div>
             </div>
             <div id="soru-tarih">
-              <span class="text-text-color">{{ this.today }}</span>
+              <span class="text-text-color">{{ soru.createdAt }}</span>
             </div>
           </div>
         </div>

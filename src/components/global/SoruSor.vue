@@ -60,6 +60,8 @@ import konuListesi from "@/data/konu.json";
           </InputSelect>
         </div>
         <div class="flex justify-center">
+          <Loader v-if="loader" />
+
           <InputButton
             @click="soruOlustur"
             class="bg-dark-purple w-full outline-none"
@@ -76,6 +78,11 @@ import konuListesi from "@/data/konu.json";
 import { eventBus } from "@/main.js";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import box from "@/store/box.js";
+import Loader from "@/components/global/Loader.vue";
+import { ref } from "vue";
+
+const loader = ref(false);
 
 export default {
   data() {
@@ -139,6 +146,7 @@ export default {
         console.log("Token bulunamadı.");
       }
       try {
+        loader.value = true; // Start the loader
         const response = await axios.post("http://localhost:3000/soru-ekle", {
           title: this.soru.title,
           explain: this.soru.explain,
@@ -152,10 +160,16 @@ export default {
           token: localStorage.getItem("token"),
         });
         this.questions.push(response.data);
+        box.addSuccess("Tebrikler", "Soru Oluşturma İşlemi Başarılı!");
+        return (loader.value = false);
 
         // this.reset();
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error(error);
+      } finally {
+        loader.value = false; // Stop the loader regardless of success or failure
       }
     },
     async fetchQuestions() {

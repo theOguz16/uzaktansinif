@@ -1,5 +1,5 @@
 <script setup>
-import Search from "@/components/forms/InputSearch.vue";
+import Search from "../global/Search.vue";
 import Timer from "../sidebar/Timer.vue";
 </script>
 <template>
@@ -17,12 +17,8 @@ import Timer from "../sidebar/Timer.vue";
             />
           </RouterLink>
         </div>
-        <div
-          placeholder="Arama Yap..."
-          id="search"
-          class="mx-auto max-lg:w-[15%] max-lg:m-0"
-        >
-          <Search />
+        <div>
+          <Search></Search>
         </div>
         <div><Timer></Timer></div>
         <div

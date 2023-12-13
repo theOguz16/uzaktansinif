@@ -1,5 +1,5 @@
 import { reactive, ref, markRaw } from "vue";
-import { addToast } from "@/store/toast.js";
+import { addToast } from "@/store/widget/toast.js";
 
 const box = {
   addError(title = "Hata", text = "İşlem başarısız", time = 3000) {

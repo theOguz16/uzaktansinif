@@ -1,5 +1,6 @@
 <template>
   <Header></Header>
+
   <div
     class="container mt-6 flex gap-8 items-start justify-center flex-row max-sm:p-4 max-sm:flex-col max-sm:justify-center max-sm:items-center max-sm:text-center max-lg:flex-col"
   >
@@ -17,7 +18,7 @@
       <Takvim
         class="mb-6 max-lg:items-center max-lg:flex max-lg:justify-center"
       ></Takvim>
-      <SinifUyeleri></SinifUyeleri>
+      <SinifUyeleri class=""></SinifUyeleri>
     </div>
   </div>
 </template>
@@ -28,6 +29,8 @@ import CanliDers from "../components/sidebar/CanliDers.vue";
 import SinifUyeleri from "../components/sidebar/SinifUyeleri.vue";
 import Takvim from "../components/sidebar/Takvim.vue";
 import Kategoriler from "../components/sidebar/Kategoriler.vue";
+import box from "../store/box.js";
+import Loader from "../components/global/Loader.vue";
 export default {
   components: {
     SoruSor,
@@ -36,10 +39,16 @@ export default {
     SinifUyeleri,
     Takvim,
     Kategoriler,
+    Loader,
   },
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    basici() {
+      box.addSuccess("Basiciyim", "basicilar");
+      box.addError("puahah", "ahah");
+    },
+  },
 };
 </script>

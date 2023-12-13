@@ -3,6 +3,7 @@ import Yorum from "./Yorum.vue";
 import { eventBus } from "../../main.js";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
+import box from "@/store/box.js";
 
 export default {
   props: {
@@ -84,23 +85,43 @@ export default {
         console.error("Yorum ayrıntılarını alma hatası:", error);
       }
     },
-    // async usernameBul() {
-    //   const token = localStorage.getItem("token");
+    async yorumBegen(yorum) {
+      try {
+        const response = await axios.post("http://localhost:3000/yorum-begen", {
+          commentExplain: yorum.commentExplain,
+        });
 
-    //   if (token) {
-    //     // Token varsa, çözme işlemine başlayabilirsiniz
-    //     const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+        // Beğeni işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
+        // Örneğin:
+        yorum.likeCount = response.data.likeCount;
+        yorum.isLiked = response.data.isLiked;
 
-    //     // Token içindeki verilere erişin
-    //     this.username = decodedToken.username;
+        box.addSuccess("Tebrikler", "Yorum Beğenme İşlemi Başarılı!");
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
 
-    //     // Kullanıcı adını kullanabilirsiniz
-    //     console.log("Kullanıcı Adı: ", this.username);
-    //   } else {
-    //     // Token bulunamadı veya localStorage'da saklanmamış
-    //     console.log("Token bulunamadı.");
-    //   }
-    // },
+        console.error(error);
+      }
+    },
+    async questionBegen(yorum) {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/question-begen",
+          {
+            commentExplain: yorum.commentExplain,
+          }
+        );
+
+        yorum.questionCount = response.data.questionCount;
+        yorum.isQuestion = response.data.isQuestion;
+
+        box.addSuccess("Tebrikler", "Yorum Anlamadım İşlemi Başarılı!");
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
+        console.error(error);
+      }
+    },
 
     async yorumSil(yorum) {
       try {
@@ -116,12 +137,14 @@ export default {
             },
           }
         );
-
+        box.addSuccess("Tebrikler", "Yorum Silme İşlemi Başarılı!");
         this.user.sorulanSoru--;
 
         // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.yorumList = this.yorumList.filter((yorum) => yorum !== yorum);
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error("Yorum silme hatası:", error);
       }
     },
@@ -200,7 +223,7 @@ export default {
           </div>
         </div>
         <div>
-          <span class="text-text-color">{{ this.today }}</span>
+          <span class="text-text-color">{{ soru.createdAt }}</span>
         </div>
       </div>
       <div id="soru-resmi">
@@ -217,7 +240,7 @@ export default {
         <div id="icons" class="flex items-center justify-center gap-2">
           <div class="flex items-center justify-center flex-col gap-1">
             <fai
-              @click="likeCounter(yorum)"
+              @click="yorumBegen(yorum)"
               :class="yorum.isLiked ? 'text-dark-purple' : ''"
               class="text-body-color text-xl cursor-pointer hover:text-dark-purple transition-all"
               icon="heart"
@@ -228,7 +251,7 @@ export default {
           </div>
           <div class="flex items-center justify-center flex-col gap-1">
             <fai
-              @click="questionCounter(yorum)"
+              @click="questionBegen(yorum)"
               :class="yorum.isQuestion ? 'text-dark-purple' : ''"
               class="text-body-color text-xl cursor-pointer hover:text-dark-purple transition-all"
               icon="question"

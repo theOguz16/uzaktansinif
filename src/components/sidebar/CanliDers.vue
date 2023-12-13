@@ -1,5 +1,7 @@
 <script>
 import axiosInstance from "@/lib/axios";
+import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   data() {
@@ -11,6 +13,43 @@ export default {
     };
   },
   methods: {
+    async createLink() {
+      try {
+        const response = await axios.post("http://localhost:3000/api/link", {
+          link: this.link,
+        });
+        console.log("Link oluşturuldu veya güncellendi:", response.data);
+        box.addSuccess("Tebrikler", "Canlı Ders Oluşturma İşlemi Başarılı!");
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+        console.error(
+          "Link oluşturulurken veya güncellenirken bir hata oluştu:",
+          error
+        );
+      }
+    },
+
+    async getLink() {
+      try {
+        const response = await axios.get("http://localhost:3000/api/link");
+        console.log("Link getirildi:", response.data);
+        this.link = response.data.link;
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
+        console.error("Link getirilirken bir hata oluştu:", error);
+      }
+    },
+
+    async logMessage() {
+      if (this.user.role === "Student") {
+        // Öğrenciyse belirli bir URL'ye yönlendirmek yerine başka bir yere yönlendir
+        window.location.href = this.link;
+        box.addSuccess("Tebrikler", "Canlı Derse Katılma İşlemi Başarılı");
+      } else if (this.user.role === "Teacher") {
+        this.createLink();
+      }
+    },
     onMouseEnter() {
       this.isHovered = true;
     },
@@ -20,12 +59,16 @@ export default {
     toggleVisibility() {
       this.isVisible = !this.isVisible;
     },
-    logMessage() {
-      console.log(this.link);
-    },
+  },
+  created() {
+    this.getLink();
   },
 
   async mounted() {
+    setInterval(() => {
+      this.getLink();
+      console.log(this.getLink());
+    }, 10000);
     const result = await axiosInstance.get("http://localhost:3000/canliders");
 
     this.user = result.data.user;
@@ -37,17 +80,17 @@ export default {
   <div>
     <button
       v-if="this.user?.role === 'Student'"
-      @click="toggleVisibility"
+      :to="`/${this.link}`"
       v-on:click="logMessage"
       class="bg-dark-purple text-center text-white px-4 py-3 rounded-[4px] w-full mb-3 outline-none"
     >
       Derse Katıl
-      <fai
+      <!-- <fai
         class="ml-2"
         icon="info"
         @:mouseenter="onMouseEnter"
         @:mouseleave="onMouseLeave"
-      ></fai>
+      ></fai> -->
     </button>
 
     <button
@@ -64,10 +107,11 @@ export default {
         @:mouseleave="onMouseLeave"
       ></fai>
     </button>
+    <!-- <button @click="createLink">Linki Kaydet</button> -->
 
-    <div>
+    <!-- <div>
       <a :href="link">Derse Katıl</a>
-    </div>
+    </div> -->
 
     <div v-if="isVisible">
       <InputText

@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   data() {
@@ -18,16 +19,21 @@ export default {
         });
 
         if (response.status === 200) {
+          box.addSuccess("Tebrikler", "Giriş Başarılı!");
           const token = response.data.token;
           localStorage.setItem("token", token);
           this.$router.push("/profile");
         } else {
+          box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
           console.error(
             "Kimlik doğrulama başarısız. Sunucu cevabı: ",
             response.data.message
           );
         }
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error("Bir hata oluştu:", error);
       }
     },

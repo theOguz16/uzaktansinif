@@ -18,46 +18,30 @@ export default {
     Kategoriler,
     LikeAndComment,
   },
-
   data() {
     return {
       sorular: [],
-      konu: "",
+      search: "",
     };
   },
   methods: {
-    async getKategoriler() {
+    async getSearch() {
       try {
         const response = await axios.get(
-          `http://localhost:3000/sorular/konular/${this.$route.params.konu}`
+          `http://localhost:3000/search/${this.$route.params.search}`
         );
         this.sorular = response.data;
       } catch (error) {
         console.error("Bir hata oluştu:", error);
       }
     },
-    async soruSil(itemToDelete) {
-      try {
-        const response = await axios.delete(
-          `http://localhost:3000/sorular/${itemToDelete._id}`,
-          {}
-        );
-
-        // this.user.sorulanSoru--;
-
-        // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
-        this.sorular = this.sorular.filter((soru) => soru !== itemToDelete);
-      } catch (error) {
-        console.error("Soru silme hatası:", error);
-      }
-    },
   },
   created() {
-    this.getKategoriler();
+    this.getSearch();
   },
   mounted() {
     setInterval(() => {
-      this.getKategoriler();
+      this.getSearch();
     }, 10000);
   },
 };
@@ -72,7 +56,7 @@ export default {
       <Kategoriler></Kategoriler>
     </div>
     <div class="w-full">
-      <div v-for="soru in sorular">
+      <div v-for="search in sorular">
         <div class="bg-white flex flex-col gap-4 p-8 mb-10">
           <div id="soru-header" class="flex items-center justify-between">
             <div id="soru-paylasan" class="flex items-center gap-2">
@@ -81,45 +65,45 @@ export default {
                 alt="person"
                 class="w-[8%] rounded-[50%]"
               />
-              <span class="text-body-color font-bold">{{ soru.username }}</span>
+              <span class="text-body-color font-bold">{{
+                search.username
+              }}</span>
               <p class="text-text-color">tarafından</p>
             </div>
             <div>
               <div id="soru-onay mb-2">
                 <div
                   class="flex items-center justify-end mr-4 cursor-pointer max-sm:items-left"
-                >
-                  <fai @click="soruSil(soru)" icon="trash"></fai>
-                </div>
+                ></div>
               </div>
               <div id="soru-tarih">
-                <span class="text-text-color">{{ soru.createdAt }}</span>
+                <span class="text-text-color">{{ search.createdAt }}</span>
               </div>
             </div>
           </div>
           <div id="soru-icerigi" class="flex flex-col gap-4">
             <div id="soru-basligi">
-              <h2 class="text-body-color">{{ soru.soruBasligi }}</h2>
+              <h2 class="text-body-color">{{ search.soruBasligi }}</h2>
             </div>
             <div id="soru-icerigi">
               <p class="text-text-color">
-                {{ soru.soruAciklamasi }}
+                {{ search.soruAciklamasi }}
               </p>
             </div>
             <div id="soru-resmi">
               <img
                 class="soru-resim"
-                :src="'http://localhost:3000/image/' + soru.imageUrl"
-                :alt="soru.title"
+                :src="'http://localhost:3000/image/' + search.imageUrl"
+                :alt="search.title"
               />
             </div>
           </div>
           <div
             class="p-2 rounded text-white bg-dark-pink w-[23%] text-center max-sm:w-full"
           >
-            {{ soru.konu }}
+            {{ search.konu }}
           </div>
-          <LikeAndComment :soru="soru"></LikeAndComment>
+          <LikeAndComment :soru="search"></LikeAndComment>
         </div>
       </div>
     </div>
