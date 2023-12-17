@@ -8,8 +8,6 @@ const port = 3000;
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-console.log(process.env.PORT, "port");
-
 const middlewareAuth = require("./middlewares/auth");
 
 app.use(bodyParser.json());
@@ -40,7 +38,6 @@ app.get("/profile", middlewareAuth, async function (req, res) {
 
 app.get("/profile/sorular", middlewareAuth, async function (req, res) {
   try {
-    console.log("user", req.user);
     const sorular = await Soru.find(
       { username: req.user.username },
       { yorumlar: 0 }
@@ -111,7 +108,6 @@ app.delete(
 app.get("/profile/odevler", middlewareAuth, async function (req, res) {
   try {
     // Kullanıcının ödevlerini alın
-    console.log("user", req.user);
     const odevler = await Odev.find({ username: req.user.username });
 
     return res.json({
@@ -126,7 +122,6 @@ app.get("/profile/odevler", middlewareAuth, async function (req, res) {
 app.delete("/profile/odevler/:soruID", async function (req, res) {
   try {
     const odevID = req.params.soruID;
-    console.log("odevID:", odevID);
 
     await Odev.findByIdAndDelete(odevID);
 
@@ -441,28 +436,37 @@ app.get("/soru-ekle", async (req, res) => {
 });
 
 //Soru beğenme
-app.post("/soru-begen", async (req, res) => {
+app.post("/soru-begen", middlewareAuth, async (req, res) => {
   const soruBasligi = req.body.soruBasligi;
+  let isLiked = false;
+
   try {
-    const ilgiliSoru = await Soru.findOne({ soruBasligi: soruBasligi });
+    const ilgiliSoru = await Soru.findOne({ soruBasligi });
 
-    if (ilgiliSoru) {
-      if (ilgiliSoru.isLiked) {
-        ilgiliSoru.likeCount--;
-        ilgiliSoru.isLiked = false;
-      } else {
-        ilgiliSoru.likeCount++;
-        ilgiliSoru.isLiked = true;
-      }
-
-      await ilgiliSoru.save();
-      res.status(200).json(ilgiliSoru);
-    } else {
-      res.status(404).json({ hata: "Soru bulunamadı." });
+    if (!ilgiliSoru) {
+      return res.status(404).json({ hata: "Soru bulunamadı." });
     }
+
+    const user = req.user;
+
+    for (const likedUser of ilgiliSoru.isLikedUsers) {
+      if (likedUser.username == user.username) {
+        isLiked = true;
+      }
+    }
+
+    if (!isLiked) {
+      ilgiliSoru.likeCount++;
+      ilgiliSoru.isLikedUsers.push(user);
+    } else {
+      ilgiliSoru.likeCount--;
+    }
+
+    await ilgiliSoru.save();
+
+    return res.status(200).json(ilgiliSoru);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
+    return res.status(500).json({
       hata: "Soru beğenme sırasında bir hata oluştu.",
     });
   }
@@ -715,12 +719,9 @@ app.get("/yorumlar/:yorumID", async (req, res) => {
 app.delete("/yorumlar/:yorumID", async (req, res) => {
   try {
     const yorumID = req.params.yorumID;
-    console.log(yorumID);
 
     const user = await User.findOne({ username: req.body.username });
-    console.log("yapilanYorum ---" + user.yapilanYorum);
     user.yapilanYorum--;
-    console.log("yapilanYorum new" + user.yapilanYorum);
 
     user.Yorumlar.pull(yorumID);
 
@@ -878,7 +879,6 @@ app.get("/sinif-uyeleri/:username", async (req, res) => {
 app.get("/odevler/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    console.log(req.params.username, "paramsUSer");
     // Veritabanından konuya göre filtrelenmiş soruları çekin
     const users = await Odev.find({ username: username });
     res.status(200).json(users);
@@ -891,7 +891,6 @@ app.get("/odevler/:username", async (req, res) => {
 app.get("/sorular/:username", async (req, res) => {
   try {
     const username = req.params.username;
-    console.log(req.params.username, "paramsUSer");
     // Veritabanından konuya göre filtrelenmiş soruları çekin
     const users = await Soru.find({ username: username });
     res.status(200).json(users);
@@ -914,7 +913,6 @@ app.post("/user/updateTime", async (req, res) => {
     );
 
     // Güncellenmiş kullanıcıyı kullanabilirsiniz
-    console.log("User time updated:", updatedUser);
     res.json({ message: "User time updated successfully" });
   } catch (error) {
     console.error(error);
@@ -935,7 +933,6 @@ app.post("/api/link", async (req, res) => {
     //  ödevi'ı veritabanına kaydedin
     await newLink.save();
 
-    console.log(newLink);
     res.status(201).json({ mesaj: "odev başarıyla kaydedildi." });
   } catch (error) {
     console.error("odev kaydetme hatası:", error);

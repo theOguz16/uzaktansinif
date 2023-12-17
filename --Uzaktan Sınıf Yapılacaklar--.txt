@@ -12,6 +12,7 @@ frontdda soru silinince yorumu kalıyor backendde onu da sil
 2. ye aynı hesaptan yorum yapınca sorunun yorum değeri 0 oluyor
 begeni 1 kere beğeniliyor farklı tarayıcılardan da
 database keyini sakla secretKeyi env ile
+yorumlara gelen istekler
 
 
 //extra

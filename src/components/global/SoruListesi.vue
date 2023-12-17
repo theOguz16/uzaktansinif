@@ -116,7 +116,11 @@ export default {
             alt="person"
             class="w-[8%] rounded-[50%]"
           />
-          <span class="text-body-color font-bold">{{ soru.username }}</span>
+          <RouterLink :to="`/sinif-uyeleri/${soru.username}`">
+            <span class="text-body-color font-bold">{{
+              soru.username
+            }}</span></RouterLink
+          >
           <p class="text-text-color">tarafından</p>
         </div>
         <div>

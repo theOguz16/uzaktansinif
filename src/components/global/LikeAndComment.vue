@@ -3,6 +3,7 @@ import MakeComment from "./MakeComment.vue";
 import YorumListesi from "./YorumListesi.vue";
 import axios from "axios";
 import box from "@/store/box.js";
+import axiosInstance from "@/lib/axios";
 
 export default {
   props: {
@@ -25,9 +26,12 @@ export default {
   methods: {
     async soruBegen() {
       try {
-        const response = await axios.post("http://localhost:3000/soru-begen", {
-          soruBasligi: this.soru.soruBasligi,
-        });
+        const response = await axiosInstance.post(
+          "http://localhost:3000/soru-begen",
+          {
+            soruBasligi: this.soru.soruBasligi,
+          }
+        );
 
         // Beğeni işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
         // Örneğin:

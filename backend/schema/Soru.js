@@ -20,10 +20,7 @@ const PostSchema = new Schema({
     type: Number,
     default: 0,
   },
-  isLiked: {
-    type: Boolean,
-    default: false,
-  },
+  isLikedUsers: [],
   yorumCount: {
     type: Number,
     default: 0,
