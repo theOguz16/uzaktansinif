@@ -21,6 +21,7 @@ const PostSchema = new Schema({
     default: 0,
   },
   isLikedUsers: [],
+  isCommantedUsers: [],
   yorumCount: {
     type: Number,
     default: 0,
@@ -41,6 +42,9 @@ const PostSchema = new Schema({
   },
   token: {
     type: String,
+  },
+  isLiked: {
+    type: Boolean,
   },
   Sorular: [],
 

@@ -4,7 +4,7 @@
       <input
         type="search"
         placeholder="Search"
-        class="border-b-2 w-full border-gray-200 rounded-md py-2 px-6"
+        class="border-b-2 w-full border-gray-200 rounded-md py-2 px-6 max-sm:text-sm max-sm:p-[6px]"
         v-model="searchText"
         @keyup.enter="handleSearch"
       />
@@ -27,6 +27,7 @@ input:focus {
 <script>
 import axios from "axios";
 import box from "@/store/box.js";
+import axiosInstance from "@/lib/axios";
 
 export default {
   data() {
@@ -39,9 +40,12 @@ export default {
   methods: {
     async handleSearch() {
       try {
-        const response = await axios.post("http://localhost:3000/search", {
-          searchText: this.searchText,
-        });
+        const response = await axiosInstance.post(
+          "http://localhost:3000/search",
+          {
+            searchText: this.searchText,
+          }
+        );
 
         this.searchResults = response.data;
 
@@ -52,8 +56,6 @@ export default {
         this.$router.push(`/search/${this.search.soruAciklamasi}`);
 
         box.addSuccess("Tebrikler", "Arama İşlemi Başarılı!");
-
-        console.log(this.searchResults, "srcres");
       } catch (error) {
         console.error("Arama hatası:", error);
         box.addError("Üzgünüm", "Böyle bir içerik bulunamadı!");

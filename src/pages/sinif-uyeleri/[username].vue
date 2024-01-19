@@ -1,5 +1,7 @@
 <script>
-import axios from "axios";
+import box from "@/store/box.js";
+import axiosInstance from "@/lib/axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   data() {
@@ -8,13 +10,57 @@ export default {
       users: [],
       sorular: [],
       odevler: [],
-      username: "",
+      username: null,
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
+    async usernameBul() {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+        console.log(decodedToken.username);
+
+        // Kullanıcı adını kullanabilirsiniz
+      } else {
+        // Token bulunamadı veya localStorage'da saklanmamış
+      }
+    },
+    async removeTodo(itemToDelete) {
+      if (this.username !== "admin") {
+        box.addError("Üzgünüm", "Bu soruyu sadece öğretmen silebilir.");
+        return;
+      }
+      try {
+        const response = await axiosInstance.delete(
+          `http://localhost:3000/profile/odevler/${itemToDelete._id}`
+        );
+
+        this.odevler = this.odevler.filter((odev) => odev !== itemToDelete);
+        box.addSuccess("Tebrikler", "Ödev Silme İşlemi Başarılı!");
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+        console.error("ödev silme hatası:", error);
+      }
+    },
     async getUser() {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `http://localhost:3000/sinif-uyeleri/${this.$route.params.username}`
         );
         this.users = response.data;
@@ -26,7 +72,7 @@ export default {
     },
     async getOdev() {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `http://localhost:3000/odevler/${this.$route.params.username}`
         );
         this.odevler = response.data;
@@ -36,7 +82,7 @@ export default {
     },
     async getSoru() {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `http://localhost:3000/sorular/${this.$route.params.username}`
         );
         this.sorular = response.data;
@@ -51,6 +97,7 @@ export default {
     },
   },
   created() {
+    this.usernameBul(); // Kullanıcı adını almak için bu yöntemi çağırın
     this.getUser();
     this.getOdev();
     this.getSoru();
@@ -157,7 +204,9 @@ export default {
           </div>
           <div>
             <div id="soru-tarih">
-              <span class="text-text-color">{{ soru.createdAt }}</span>
+              <span class="text-text-color">{{
+                formatTarih(soru.createdAt)
+              }}</span>
             </div>
           </div>
         </div>
@@ -173,8 +222,8 @@ export default {
           <div id="soru-resmi">
             <img
               class="soru-resim"
-              :src="'http://localhost:3000/image/' + soru.imageUrl"
-              :alt="soru.title"
+              :src="soru.imageUrl"
+              :alt="soru.soruBasligi"
             />
           </div>
         </div>
@@ -206,10 +255,18 @@ export default {
               </div>
               <div class="flex flex-col gap-1">
                 <span>Ödev Teslim Tarihi</span>
-                <span class="text-text-color">{{ odev.odevTarihi }}</span>
+                <span class="text-text-color">{{
+                  formatTarih(odev.odevTarihi)
+                }}</span>
               </div>
             </div>
           </div>
+          <button
+            class="bg-dark-pink text-white rounded p-2 w-full text-center"
+            @click="removeTodo(odev)"
+          >
+            Sil
+          </button>
         </li>
       </ul>
     </div>

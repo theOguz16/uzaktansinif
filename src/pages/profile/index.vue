@@ -1,6 +1,5 @@
 <script>
 import axiosInstance from "@/lib/axios";
-import axios from "axios";
 import box from "@/store/box.js";
 
 export default {
@@ -18,11 +17,22 @@ export default {
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
     async tytListEkle() {
       if (this.tyt.trim() !== "") {
         try {
           // Backend'e TYT netini eklemek için POST isteği gönder
-          await axios.post(
+          await axiosInstance.post(
             `http://localhost:3000/users/${this.user._id}/tyt-net`,
             {
               week: this.tytList.length + 1, // Haftayı belirlemek için mevcut hafta sayısını kullanabilirsiniz.
@@ -32,7 +42,7 @@ export default {
           this.tytList.push(this.tyt);
           box.addSuccess("Tebrikler", "TYT Netinizi Ekleme İşlemi Başarılı!");
 
-          this.tyt = ""; // Input alanını sıfırla
+          this.resetTyt();
         } catch (error) {
           box.addError("Üzgünüm", "Bir Hata Oluştu!");
           console.error("TYT net kaydetme hatası:", error);
@@ -44,7 +54,7 @@ export default {
       if (this.ayt.trim() !== "") {
         try {
           // Backend'e TYT netini eklemek için POST isteği gönder
-          await axios.post(
+          await axiosInstance.post(
             `http://localhost:3000/users/${this.user._id}/ayt-net`,
             {
               week: this.aytList.length + 1, // Haftayı belirlemek için mevcut hafta sayısını kullanabilirsiniz.
@@ -53,7 +63,7 @@ export default {
           );
           this.aytList.push(this.ayt);
           box.addSuccess("Tebrikler", "AYT Netinizi Ekleme İşlemi Başarılı!");
-          this.ayt = ""; // Input alanını sıfırla
+          this.resetAyt();
         } catch (error) {
           box.addError("Üzgünüm", "Bir Hata Oluştu!");
           console.error("AYT net kaydetme hatası:", error);
@@ -70,7 +80,7 @@ export default {
           const week = this.tytList.length + 1;
 
           // Sunucuya TYT netini güncellemek için PUT isteği gönderin
-          const response = await axios.put(
+          const response = await axiosInstance.put(
             `http://localhost:3000/users/${this.user._id}/tyt-net`,
             {
               week: week,
@@ -98,7 +108,7 @@ export default {
           const week = this.aytList.length + 1;
 
           // Sunucuya TYT netini güncellemek için PUT isteği gönderin
-          const response = await axios.put(
+          const response = await axiosInstance.put(
             `http://localhost:3000/users/${this.user._id}/tyt-net`,
             {
               week: week,
@@ -116,6 +126,15 @@ export default {
         }
       }
     },
+    resetTyt() {
+      this.tyt = null;
+      this.tytKontrol = false;
+    },
+
+    resetAyt() {
+      this.ayt = null;
+      this.aytKontrol = false;
+    },
     async getOdevler() {
       try {
         //ödevleri çekmece
@@ -123,7 +142,6 @@ export default {
           `http://localhost:3000/profile/odevler`
         );
         this.odevler = data.odevler;
-        console.log(this.odevler);
       } catch (error) {
         console.error("odevler gelmedi", error);
       }
@@ -136,7 +154,7 @@ export default {
         );
         this.tytList = tytResponse.data;
 
-        const aytResponse = await axios.get(
+        const aytResponse = await axiosInstance.get(
           `http://localhost:3000/users/${this.user._id}/ayt-net`
         );
         this.aytList = aytResponse.data;
@@ -173,7 +191,7 @@ export default {
 
     async removeTodo(itemToDelete) {
       try {
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `http://localhost:3000/profile/odevler/${itemToDelete._id}`
         );
 
@@ -194,7 +212,6 @@ export default {
     const result = await axiosInstance.get("http://localhost:3000/profile");
 
     this.user = result.data.user;
-    console.log(this.user + "user");
 
     this.getProfileData();
     this.getOdevler();
@@ -355,7 +372,9 @@ export default {
               </div>
             </div>
             <div id="soru-tarih">
-              <span class="text-text-color">{{ soru.createdAt }}</span>
+              <span class="text-text-color">{{
+                formatTarih(soru.createdAt)
+              }}</span>
             </div>
           </div>
         </div>
@@ -371,8 +390,8 @@ export default {
           <div id="soru-resmi">
             <img
               class="soru-resim"
-              :src="'http://localhost:3000/image/' + soru.imageUrl"
-              :alt="soru.title"
+              :src="soru.imageUrl"
+              :alt="soru.soruBasligi"
             />
           </div>
         </div>
@@ -404,11 +423,14 @@ export default {
               </div>
               <div class="flex flex-col gap-1">
                 <span>Ödev Teslim Tarihi</span>
-                <span class="text-text-color">{{ odev.odevTarihi }}</span>
+                <span class="text-text-color">{{
+                  formatTarih(odev.odevTarihi)
+                }}</span>
               </div>
             </div>
           </div>
           <button
+            v-if="this.user?.role === 'Teacher'"
             class="bg-dark-pink text-white rounded p-2 w-full text-center"
             @click="removeTodo(odev)"
           >

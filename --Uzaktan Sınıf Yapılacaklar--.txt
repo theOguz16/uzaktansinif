@@ -1,18 +1,18 @@
 
 
-imglar çözülmedi --> multeri araştır sonralarda yunus abiyle çözülecek
-!!!!!soru, yorum, odev vb kısımda reset fonksiyonlarını çalıştır
-Loader nasıl kullanılıyor anlamadım
+- (isteklere tekrar bak çok geliyor mu yunus abiye sor)
+deployed service vercel demosunu yayınla 
+backend içinde herocu 
+netlify
+mongodb atlas database 500mb
 
 not
-mobil tasarımı geliştir
+- mobil tasarımı geliştir
 
 buglar
-frontdda soru silinince yorumu kalıyor backendde onu da sil
-2. ye aynı hesaptan yorum yapınca sorunun yorum değeri 0 oluyor
-begeni 1 kere beğeniliyor farklı tarayıcılardan da
-database keyini sakla secretKeyi env ile
-yorumlara gelen istekler
+
+- yorum silinince sorunun yorum değeri azalsın
+- soru sorda reset fonksiyonu çalışmıyor (1. sorudan sonra 2. soru gelmiyor oluşturunca)
 
 
 //extra
@@ -20,3 +20,4 @@ profil ayarları sayfası
 kaydetmeler
 
 
+  

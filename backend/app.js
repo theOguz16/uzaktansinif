@@ -4,7 +4,8 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const bodyParser = require("body-parser");
-const port = 3000;
+const port = process.env.PORT;
+const secretKey = process.env.SECRET_KEY;
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
@@ -13,7 +14,27 @@ const middlewareAuth = require("./middlewares/auth");
 app.use(bodyParser.json());
 
 // JWT için gizli anahtar (bu gizli anahtar güvenli bir yerde saklanmalıdır)
-const secretKey = "gizli_anahtar";
+
+//AWS
+
+const AWS = require("aws-sdk");
+
+AWS.config.update({
+  accessKeyId: "AKIAXYKJRKP7VZNFHB7G",
+  secretAccessKey: "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",
+  region: "eu-north-1",
+});
+
+const s3 = new AWS.S3();
+
+const multer = require("multer");
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // limit file size to 5MB
+  },
+});
 
 const corsOptions = {
   origin: "*", // İzin verilen kökeni güncelleyin
@@ -119,18 +140,22 @@ app.get("/profile/odevler", middlewareAuth, async function (req, res) {
   }
 });
 
-app.delete("/profile/odevler/:soruID", async function (req, res) {
-  try {
-    const odevID = req.params.soruID;
+app.delete(
+  "/profile/odevler/:soruID",
+  middlewareAuth,
+  async function (req, res) {
+    try {
+      const odevID = req.params.soruID;
 
-    await Odev.findByIdAndDelete(odevID);
+      await Odev.findByIdAndDelete(odevID);
 
-    res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
-  } catch (error) {
-    console.error("profilde ödev silme hatası:", error);
-    res.status(500).json({ error: "ödev silinemedi." });
+      res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+    } catch (error) {
+      console.error("profilde ödev silme hatası:", error);
+      res.status(500).json({ error: "ödev silinemedi." });
+    }
   }
-});
+);
 
 // Örnek özel bir rotaya erişim (test)
 app.get("/private-route", middlewareAuth, (req, res) => {
@@ -175,19 +200,6 @@ const User = require("./schema/User.js");
 const Yorum = require("./schema/Yorum.js");
 const Odev = require("./schema/Odev.js");
 const Link = require("./schema/Link.js");
-
-//img
-const multer = require("multer"); //dosya kaydetmek icin
-const upload = multer({ dest: "uploads/" });
-
-app.post(
-  "/test",
-  middlewareAuth,
-  upload.single("file"),
-  function (req, res, next) {
-    console.log(req.file);
-  }
-);
 
 //db bağlanma
 const mongoose = require("mongoose");
@@ -243,7 +255,7 @@ app.post("/login", async (req, res) => {
 });
 
 //logout
-app.post("/logout", (req, res) => {
+app.post("/logout", middlewareAuth, (req, res) => {
   // Token'ı silmek, kullanıcının oturumu kapatmak anlamına gelir
   // Burada yerel depodan silmeye gerek yok, tarayıcıda yerel depo otomatik olarak temizlenir.
 
@@ -306,7 +318,7 @@ app.get("/odev/username", async (req, res) => {
   }
 });
 
-app.delete("/odev/:odevID", async (req, res) => {
+app.delete("/odev/:odevID", middlewareAuth, async (req, res) => {
   try {
     const odevID = req.params.odevID;
 
@@ -329,37 +341,42 @@ function setRoleToTeacherIfAdmin(req, res, next) {
 }
 
 // Middleware'ı "/register" endpoint'i ile birleştirin
-app.post("/register", setRoleToTeacherIfAdmin, async (req, res) => {
-  try {
-    // Gelen verileri kullanarak yeni bir user oluşturun
-    const newUser = new User({
-      username: req.body.username,
-      name: req.body.name,
-      surname: req.body.surname,
-      dateOfBirth: req.body.dateOfBirth,
-      city: req.body.city,
-      gender: req.body.gender,
-      emailAddres: req.body.emailAddres,
-      password: req.body.password,
-      role: req.body.role || "Student", // Eğer role belirtilmediyse "Student" olarak ayarla
-    });
+app.post(
+  "/register",
 
-    // User'ı veritabanına kaydedin
-    await newUser.save();
+  setRoleToTeacherIfAdmin,
+  async (req, res) => {
+    try {
+      // Gelen verileri kullanarak yeni bir user oluşturun
+      const newUser = new User({
+        username: req.body.username,
+        name: req.body.name,
+        surname: req.body.surname,
+        dateOfBirth: req.body.dateOfBirth,
+        city: req.body.city,
+        gender: req.body.gender,
+        emailAddres: req.body.emailAddres,
+        password: req.body.password,
+        role: req.body.role || "Student", // Eğer role belirtilmediyse "Student" olarak ayarla
+      });
 
-    // Kullanıcıyı kimlik doğrulama için kullanacağınız bir JWT token oluşturun
-    const token = jwt.sign({ username: newUser.username }, "gizli_anahtar");
+      // User'ı veritabanına kaydedin
+      await newUser.save();
 
-    res.status(201).json({
-      mesaj: "user başarıyla kaydedildi.",
-      token,
-    });
-  } catch (error) {
-    res.status(500).json({ hata: "user kaydedilirken bir hata oluştu." });
+      // Kullanıcıyı kimlik doğrulama için kullanacağınız bir JWT token oluşturun
+      const token = jwt.sign({ username: newUser.username }, "gizli_anahtar");
+
+      res.status(201).json({
+        mesaj: "user başarıyla kaydedildi.",
+        token,
+      });
+    } catch (error) {
+      res.status(500).json({ hata: "user kaydedilirken bir hata oluştu." });
+    }
   }
-});
+);
 
-app.get("/register", async (req, res) => {
+app.get("/register", middlewareAuth, async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -368,7 +385,7 @@ app.get("/register", async (req, res) => {
   }
 });
 
-app.get("/register/time", async (req, res) => {
+app.get("/register/time", middlewareAuth, async (req, res) => {
   try {
     // Kullanıcıları 'time' alanına göre sıralayarak getir
     const users = await User.find().sort({ time: -1 });
@@ -381,52 +398,62 @@ app.get("/register/time", async (req, res) => {
 });
 
 //Soru Ekleme
-app.post("/soru-ekle", async (req, res) => {
-  try {
-    //  Gelen verileri kullanarak yeni bir soru nesnesi oluşturun
-    const yeniSoru = new Soru({
-      soruBasligi: req.body.title,
-      soruAciklamasi: req.body.explain,
-      konu: req.body.konuListesi,
-      imageUrl: req.body.img,
-      likeCount: req.body.likeCount,
-      isLiked: req.body.isLiked,
-      yorumCount: req.body.yorumCount,
-      isCommanted: req.body.isCommanted,
-      username: req.body.username,
-      token: req.body.token, // Kullanıcının token'ını ekleyin
-      yorumlar: [
-        // {
-        //   type: Schema.Types.ObjectId,
-        //   ref: "Yorum", // 'Yorum' modeline referans veriyoruz
-        // },
-      ],
-    });
 
-    // const oturumKimligi = req.body.token;
-    // const kullaniciAdi = req.body.username;
-    // console.log(oturumKimligi, kullaniciAdi);
+app.post(
+  "/soru-ekle",
+  [middlewareAuth, upload.single("file")],
+  async (req, res) => {
+    try {
+      const params = {
+        Bucket: "uzaktansinif",
+        Key: req.file.originalname,
+        Body: req.file.buffer,
+      };
 
-    //  Soruyu veritabanına kaydedin
-    await yeniSoru.save();
+      // S3'e dosyayı yükle
+      const data = await new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        });
+      });
 
-    // Bu kod kullanıcının sorularına ekler
-    const user = await User.findOne({ username: req.body.username });
-    user.sorulanSoru++;
+      const imageUrl = data.Location;
 
-    if (user) {
-      user.addSoru(yeniSoru._id);
+      const yeniSoru = new Soru({
+        soruBasligi: req.body.title,
+        soruAciklamasi: req.body.explain,
+        konu: req.body.konuListesi,
+        imageUrl: imageUrl,
+        likeCount: req.body.likeCount,
+        isLiked: req.body.isLiked,
+        yorumCount: req.body.yorumCount,
+        isCommanted: req.body.isCommanted,
+        username: req.user.username,
+        token: req.body.token,
+        yorumlar: [],
+      });
+
+      // Dosya yükleme başarılıysa soruyu veritabanına kaydet
+      await yeniSoru.save();
+
+      const user = await User.findOne({ username: req.body.username });
+      user.sorulanSoru++;
+
+      if (user) {
+        user.addSoru(yeniSoru._id);
+      }
+
+      res.status(201).json({ mesaj: "Soru başarıyla kaydedildi." });
+    } catch (error) {
+      console.error("Soru kaydetme hatası:", error);
+      res.status(500).json({ hata: "Soru kaydedilirken bir hata oluştu." });
     }
-
-    res.status(201).json({ mesaj: "Soru başarıyla kaydedildi." });
-  } catch (error) {
-    console.error("Soru kaydetme hatası:", error);
-    res.status(500).json({ hata: "Soru kaydedilirken bir hata oluştu." });
   }
-});
+);
 
 // backendde sorulara bakma
-app.get("/soru-ekle", async (req, res) => {
+app.get("/soru-ekle", middlewareAuth, async (req, res) => {
   try {
     const sorular = await Soru.find();
     res.status(200).json(sorular);
@@ -460,6 +487,9 @@ app.post("/soru-begen", middlewareAuth, async (req, res) => {
       ilgiliSoru.isLikedUsers.push(user);
     } else {
       ilgiliSoru.likeCount--;
+      ilgiliSoru.isLikedUsers = ilgiliSoru.isLikedUsers.filter(
+        (likedUser) => likedUser.username !== user.username
+      );
     }
 
     await ilgiliSoru.save();
@@ -473,29 +503,39 @@ app.post("/soru-begen", middlewareAuth, async (req, res) => {
 });
 
 //Comment counter
-app.post("/comment-counter", async (req, res) => {
-  const { soruBasligi } = req.body;
+app.post("/comment-counter", middlewareAuth, async (req, res) => {
+  const soruBasligi = req.body.soruBasligi;
+  let isLiked = false;
 
   try {
     const ilgiliSoru = await Soru.findOne({ soruBasligi });
 
-    if (ilgiliSoru) {
-      if (ilgiliSoru.isCommanted) {
-        ilgiliSoru.yorumCount--;
-        ilgiliSoru.isCommanted = false;
-      } else {
-        ilgiliSoru.yorumCount++;
-        ilgiliSoru.isCommanted = true;
-      }
-
-      await ilgiliSoru.save();
-
-      return res.status(200).json(ilgiliSoru);
-    } else {
+    if (!ilgiliSoru) {
       return res.status(404).json({ hata: "Soru bulunamadı." });
     }
+
+    const user = req.user;
+
+    for (const likedUser of ilgiliSoru.isCommantedUsers) {
+      if (likedUser.username == user.username) {
+        isLiked = true;
+      }
+    }
+
+    if (!isLiked) {
+      ilgiliSoru.yorumCount++;
+      ilgiliSoru.isCommantedUsers.push(user);
+    } else {
+      ilgiliSoru.yorumCount--;
+      ilgiliSoru.isCommantedUsers = ilgiliSoru.isCommantedUsers.filter(
+        (likedUser) => likedUser.username !== user.username
+      );
+    }
+
+    await ilgiliSoru.save();
+
+    return res.status(200).json(ilgiliSoru);
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       hata: "Soru beğenme sırasında bir hata oluştu.",
     });
@@ -503,25 +543,25 @@ app.post("/comment-counter", async (req, res) => {
 });
 
 //Ana sayfaya tüm verileri getirme
-app.get("/sorular", async (req, res) => {
+app.get("/sorular", middlewareAuth, async (req, res) => {
   try {
-    // Veritabanından tüm soruları çekin
+    // Veritabanından tüm soruları çekin ve tarihe göre sıralayın (en yeni önce)
     const sorular = await Soru.find({});
-    res.status(200).json(sorular);
 
-    const sorularWUsername = sorular.filter((soru) => ({
+    // Kullanıcının adına göre tüm soruları bulun
+    const sorularWUsername = sorular.map((soru) => ({
       ...soru._doc,
       username: soru.username,
     }));
 
-    // Kullanıcının adına göre tüm soruları bulun
-    // console.log("sorularwidth" + sorularWUsername);
+    res.status(200).json(sorularWUsername);
   } catch (error) {
     console.error(error);
     res.status(500).json({ hata: "Soruları alma sırasında bir hata oluştu." });
   }
 });
-app.get("/soru/:soruID", async (req, res) => {
+
+app.get("/soru/:soruID", middlewareAuth, async (req, res) => {
   const soruID = req.params.soruID;
   // SoruID'ye ait sorunun ayrıntılarını veritabanından çekmek için "populate" kullanın
   const soru = await Soru.findById(soruID);
@@ -538,40 +578,82 @@ app.get("/soru/:soruID", async (req, res) => {
 });
 
 //Soru sil
-app.delete("/sorular/:soruID", async (req, res) => {
+// app.delete("/sorular/:soruID", async (req, res) => {
+//   try {
+//     const soruID = req.params.soruID;
+//     // const { username } = req.body;
+//     // const username = req.body.username;
+
+//     const user = await User.findOne({ username: req.body.username });
+//     user.sorulanSoru--;
+
+//     user.Sorular.pull(soruID);
+
+//     await user.save();
+
+//     // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
+//     const silinenSoru = await Soru.findByIdAndDelete(soruID);
+
+//     // Silinen sorunun bağlantılı yorumlarını alın
+//     const baglantiliYorum = silinenSoru.yorumlar;
+
+//     // Bağlantılı yorumları silebilirsiniz
+//     for (const yorumID of baglantiliYorum) {
+//       await Yorum.findByIdAndDelete(yorumID);
+//     }
+
+//     // Eğer soru kullanıcının sahip olduğu bir soru ise, silinmesine izin verin
+//     if (req.username === req.user.username) {
+//       // Soruyu veritabanından silin
+//       await Soru.findByIdAndDelete(soruID);
+//       return res.json({ mesaj: "Soru başarıyla silindi." });
+//     } else {
+//       return res.status(403).json({ hata: "Bu soruyu silme izniniz yok." });
+//     }
+
+//     res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+//   } catch (error) {
+//     console.error("Soru silme hatası:", error);
+//     res.status(500).json({ error: "Soru silinemedi." });
+//   }
+// });
+
+app.delete("/sorular/:soruID", middlewareAuth, async (req, res) => {
   try {
     const soruID = req.params.soruID;
-    // const { username } = req.body;
-    // const username = req.body.username;
+    const username = req.user.username;
+    // Kullanıcıyı bul
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ hata: "Kullanıcı bulunamadı." });
+    }
 
-    const user = await User.findOne({ username: req.body.username });
+    // Kullanıcının sorduğu soru sayısını azalt
     user.sorulanSoru--;
 
+    // Kullanıcının sorularından sormuş olduğu soruyu çıkar
     user.Sorular.pull(soruID);
 
+    // Kullanıcı bilgilerini kaydet
     await user.save();
 
-    // MongoDB'den soruyu silmek için gerekli sorguyu çalıştırın
+    // Soruyu ve bağlantılı yorumları sil
     const silinenSoru = await Soru.findByIdAndDelete(soruID);
 
-    // Silinen sorunun bağlantılı yorumlarını alın
+    if (!silinenSoru) {
+      return res.status(404).json({ hata: "Soru bulunamadı." });
+    }
+
+    // Sorunun bağlantılı yorumlarını al
     const baglantiliYorum = silinenSoru.yorumlar;
 
-    // Bağlantılı yorumları silebilirsiniz
+    // Bağlantılı yorumları sil
     for (const yorumID of baglantiliYorum) {
       await Yorum.findByIdAndDelete(yorumID);
     }
 
-    // Eğer soru kullanıcının sahip olduğu bir soru ise, silinmesine izin verin
-    if (req.username === req.user.username) {
-      // Soruyu veritabanından silin
-      await Soru.findByIdAndDelete(soruID);
-      return res.json({ mesaj: "Soru başarıyla silindi." });
-    } else {
-      return res.status(403).json({ hata: "Bu soruyu silme izniniz yok." });
-    }
-
-    res.status(204).send(); // Başarılı yanıt, içerik olmadan (No Content)
+    // Başarılı yanıt, içerik olmadan (No Content)
+    res.status(204).send();
   } catch (error) {
     console.error("Soru silme hatası:", error);
     res.status(500).json({ error: "Soru silinemedi." });
@@ -579,45 +661,66 @@ app.delete("/sorular/:soruID", async (req, res) => {
 });
 
 // Yorum ekle
-app.post("/soru/:soruID/yorum-ekle", async (req, res) => {
-  try {
-    const soruID = req.params.soruID;
-    const yeniYorum = new Yorum({
-      commentExplain: req.body.commentExplain,
-      imageUrl: req.body.img,
-      likeCount: req.body.likeCount,
-      isLiked: req.body.isLiked,
-      questionCount: req.body.questionCount,
-      isQuestion: req.body.isQuestion,
-      blueBg: req.body.blueBg,
-      greenBg: req.body.greenBg,
-      yorumlar: [],
-      username: req.body.username,
-      token: req.body.token,
-    });
-    await yeniYorum.save();
+app.post(
+  "/soru/:soruID/yorum-ekle",
+  [middlewareAuth, upload.single("file")],
+  async (req, res) => {
+    try {
+      const params = {
+        Bucket: "uzaktansinif",
+        Key: req.file.originalname,
+        Body: req.file.buffer,
+      };
 
-    const user = await User.findOne({ username: req.body.username });
-    user.yapilanYorum++;
+      // S3'e dosyayı yükle
+      const data = await new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        });
+      });
 
-    if (user) {
-      user.addYorum(yeniYorum._id);
+      const imageUrl = data.Location;
+      const soruID = req.params.soruID;
+
+      const yeniYorum = new Yorum({
+        commentExplain: req.body.commentExplain,
+        imageUrl: req.body.img,
+        likeCount: req.body.likeCount,
+        isLiked: req.body.isLiked,
+        questionCount: req.body.questionCount,
+        isQuestion: req.body.isQuestion,
+        blueBg: req.body.blueBg,
+        greenBg: req.body.greenBg,
+        yorumlar: [],
+        imageUrl: imageUrl,
+        username: req.user.username,
+        token: req.body.token,
+      });
+      await yeniYorum.save();
+
+      const user = await User.findOne({ username: req.body.username });
+      // user.yapilanYorum++;
+
+      if (user) {
+        user.addYorum(yeniYorum._id);
+      }
+
+      // Yeni yorumun kimliğini alın
+      const yorumID = yeniYorum._id;
+
+      // Soruya yeni yorumun kimliğini ekleyin
+      const soru = await Soru.findById(soruID);
+      soru.yorumlar.push(yorumID);
+      await soru.save();
+
+      res.status(201).json({ mesaj: "Yorum başarıyla kaydedildi." });
+    } catch (error) {
+      console.error("Yorum ekleme hatası:", error);
+      res.status(500).json({ hata: "Yorum eklenirken bir hata oluştu." });
     }
-
-    // Yeni yorumun kimliğini alın
-    const yorumID = yeniYorum._id;
-
-    // Soruya yeni yorumun kimliğini ekleyin
-    const soru = await Soru.findById(soruID);
-    soru.yorumlar.push(yorumID);
-    await soru.save();
-
-    res.status(201).json({ mesaj: "Yorum başarıyla kaydedildi." });
-  } catch (error) {
-    console.error("Yorum ekleme hatası:", error);
-    res.status(500).json({ hata: "Yorum eklenirken bir hata oluştu." });
   }
-});
+);
 
 // Soruya ait yorumları alma
 app.get("/soru/:soruID/yorumlar", async (req, res) => {
@@ -632,62 +735,86 @@ app.get("/soru/:soruID/yorumlar", async (req, res) => {
   }
 });
 
-app.post("/yorum-begen", async (req, res) => {
+app.post("/yorum-begen", middlewareAuth, async (req, res) => {
   const commentExplain = req.body.commentExplain;
+  let isLiked = false;
+
   try {
-    const ilgiliYorum = await Yorum.findOne({ commentExplain: commentExplain });
+    const ilgiliYorum = await Yorum.findOne({ commentExplain });
 
-    if (ilgiliYorum) {
-      if (ilgiliYorum.isLiked) {
-        ilgiliYorum.likeCount--;
-        ilgiliYorum.isLiked = false;
-      } else {
-        ilgiliYorum.likeCount++;
-        ilgiliYorum.isLiked = true;
-      }
-
-      await ilgiliYorum.save();
-      res.status(200).json(ilgiliYorum);
-    } else {
-      res.status(404).json({ hata: "Soru bulunamadı." });
+    if (!ilgiliYorum) {
+      return res.status(404).json({ hata: "Yorum bulunamadı." });
     }
+
+    const user = req.user;
+
+    for (const likedUser of ilgiliYorum.isLikedUsers) {
+      if (likedUser.username == user.username) {
+        isLiked = true;
+      }
+    }
+
+    if (!isLiked) {
+      ilgiliYorum.likeCount++;
+      ilgiliYorum.isLikedUsers.push(user);
+    } else {
+      ilgiliYorum.likeCount--;
+      ilgiliYorum.isLikedUsers = ilgiliYorum.isLikedUsers.filter(
+        (likedUser) => likedUser.username !== user.username
+      );
+    }
+
+    await ilgiliYorum.save();
+
+    return res.status(200).json(ilgiliYorum);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      hata: "Soru beğenme sırasında bir hata oluştu.",
+    return res.status(500).json({
+      hata: "Yorum beğenme sırasında bir hata oluştu.",
     });
   }
 });
 
-app.post("/question-begen", async (req, res) => {
+app.post("/question-begen", middlewareAuth, async (req, res) => {
   const commentExplain = req.body.commentExplain;
+  let isQuestion = false;
+
   try {
-    const ilgiliYorum = await Yorum.findOne({ commentExplain: commentExplain });
+    const ilgiliYorum = await Yorum.findOne({ commentExplain });
 
-    if (ilgiliYorum) {
-      if (ilgiliYorum.isQuestion) {
-        ilgiliYorum.questionCount--;
-        ilgiliYorum.isQuestion = false;
-      } else {
-        ilgiliYorum.questionCount++;
-        ilgiliYorum.isQuestion = true;
-      }
-
-      await ilgiliYorum.save();
-      res.status(200).json(ilgiliYorum);
-    } else {
-      res.status(404).json({ hata: "Soru bulunamadı." });
+    if (!ilgiliYorum) {
+      return res.status(404).json({ hata: "Yorum bulunamadı." });
     }
+
+    const user = req.user;
+
+    for (const questionUser of ilgiliYorum.isQuestionUsers) {
+      if (questionUser.username == user.username) {
+        isQuestion = true;
+      }
+    }
+
+    if (!isQuestion) {
+      ilgiliYorum.questionCount++;
+      ilgiliYorum.isQuestionUsers.push(user);
+    } else {
+      ilgiliYorum.questionCount--;
+      ilgiliYorum.isQuestionUsers = ilgiliYorum.isQuestionUsers.filter(
+        (questionUser) => questionUser.username !== user.username
+      );
+    }
+
+    await ilgiliYorum.save();
+
+    return res.status(200).json(ilgiliYorum);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      hata: "Soru beğenme sırasında bir hata oluştu.",
+    return res.status(500).json({
+      hata: "Yorum beğenme sırasında bir hata oluştu.",
     });
   }
 });
 
 //backendde yorumlara bakma
-app.get("/yorumlar", async (req, res) => {
+app.get("/yorumlar", middlewareAuth, async (req, res) => {
   try {
     const yorumlar = await Yorum.find();
     res.status(200).json(yorumlar);
@@ -716,11 +843,15 @@ app.get("/yorumlar/:yorumID", async (req, res) => {
   }
 });
 //yorum sil
-app.delete("/yorumlar/:yorumID", async (req, res) => {
+app.delete("/yorumlar/:yorumID", middlewareAuth, async (req, res) => {
   try {
+    const user = await User.findOne({ username: req.body.username });
+
     const yorumID = req.params.yorumID;
 
-    const user = await User.findOne({ username: req.body.username });
+    const yorum = await Yorum.findById(yorumID);
+    console.log(yorum);
+
     user.yapilanYorum--;
 
     user.Yorumlar.pull(yorumID);
@@ -737,7 +868,7 @@ app.delete("/yorumlar/:yorumID", async (req, res) => {
   }
 });
 //TYT netleri
-app.post("/users/:userId/tyt-net", async (req, res) => {
+app.post("/users/:userId/tyt-net", middlewareAuth, async (req, res) => {
   try {
     const { userId } = req.params;
     const { week, net } = req.body;
@@ -793,7 +924,7 @@ app.get("/users/:userId/tyt-net", async (req, res) => {
 });
 
 //AYT netleri
-app.post("/users/:userId/ayt-net", async (req, res) => {
+app.post("/users/:userId/ayt-net", middlewareAuth, async (req, res) => {
   try {
     const { userId } = req.params;
     const { week, net } = req.body;
@@ -813,7 +944,7 @@ app.post("/users/:userId/ayt-net", async (req, res) => {
 });
 
 // Kullanıcının belirli bir haftadaki AYT netini getirmek için bir GET endpoint'i
-app.get("/users/:userId/ayt-net/:week", async (req, res) => {
+app.get("/users/:userId/ayt-net/:week", middlewareAuth, async (req, res) => {
   try {
     const { userId, week } = req.params;
     const user = await User.findById(userId);
@@ -834,7 +965,7 @@ app.get("/users/:userId/ayt-net/:week", async (req, res) => {
   }
 });
 // Kullanıcının tüm AYT netlerini getirmek için bir GET endpoint'i
-app.get("/users/:userId/ayt-net", async (req, res) => {
+app.get("/users/:userId/ayt-net", middlewareAuth, async (req, res) => {
   try {
     const userId = req.params.userId;
     const user = await User.findById(userId);
@@ -850,7 +981,7 @@ app.get("/users/:userId/ayt-net", async (req, res) => {
 
 //soru Konuları filtreleme
 
-app.get("/sorular/konular/:konu", async (req, res) => {
+app.get("/sorular/konular/:konu", middlewareAuth, async (req, res) => {
   try {
     const konu = req.params.konu;
     // Veritabanından konuya göre filtrelenmiş konuları çekin
@@ -864,7 +995,7 @@ app.get("/sorular/konular/:konu", async (req, res) => {
 
 //sinif uyeleri
 
-app.get("/sinif-uyeleri/:username", async (req, res) => {
+app.get("/sinif-uyeleri/:username", middlewareAuth, async (req, res) => {
   try {
     const username = req.params.username;
     // Veritabanından konuya göre filtrelenmiş userlari çekin
@@ -876,7 +1007,7 @@ app.get("/sinif-uyeleri/:username", async (req, res) => {
   }
 });
 
-app.get("/odevler/:username", async (req, res) => {
+app.get("/odevler/:username", middlewareAuth, async (req, res) => {
   try {
     const username = req.params.username;
     // Veritabanından konuya göre filtrelenmiş soruları çekin
@@ -888,7 +1019,7 @@ app.get("/odevler/:username", async (req, res) => {
   }
 });
 
-app.get("/sorular/:username", async (req, res) => {
+app.get("/sorular/:username", middlewareAuth, async (req, res) => {
   try {
     const username = req.params.username;
     // Veritabanından konuya göre filtrelenmiş soruları çekin
@@ -923,7 +1054,7 @@ app.post("/user/updateTime", async (req, res) => {
 //CanliDers Link
 
 // POST isteği ile link oluşturma veya güncelleme
-app.post("/api/link", async (req, res) => {
+app.post("/api/link", middlewareAuth, async (req, res) => {
   try {
     //  Gelen verileri kullanarak yeni bir ödev  oluşturun
     const newLink = new Link({
@@ -941,7 +1072,7 @@ app.post("/api/link", async (req, res) => {
 });
 
 // GET isteği ile linki getirme
-app.get("/api/link", async (req, res) => {
+app.get("/api/link", middlewareAuth, async (req, res) => {
   try {
     const linkDocument = await Link.find({}).sort({ _id: -1 }).limit(1);
 
@@ -956,7 +1087,7 @@ app.get("/api/link", async (req, res) => {
   }
 });
 
-app.post("/search", async (req, res) => {
+app.post("/search", middlewareAuth, async (req, res) => {
   try {
     const searchText = req.body.searchText;
 
@@ -969,7 +1100,7 @@ app.post("/search", async (req, res) => {
   }
 });
 
-app.get("/search/:search", async (req, res) => {
+app.get("/search/:search", middlewareAuth, async (req, res) => {
   try {
     const search = req.params.search;
     // Veritabanından searche göre filtrelenmiş konuları çekin
@@ -979,6 +1110,24 @@ app.get("/search/:search", async (req, res) => {
     console.error(error);
     res.status(500).json({ hata: "Soruları alma sırasında bir hata oluştu." });
   }
+});
+
+//AWS IMG
+app.post("/upload", upload.single("file"), (req, res) => {
+  const params = {
+    Bucket: "your_bucket_name",
+    Key: req.file.originalname,
+    Body: req.file.buffer,
+  };
+
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Error uploading file");
+    }
+
+    res.send("File uploaded successfully");
+  });
 });
 
 app.listen(port, () => {

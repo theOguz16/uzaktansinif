@@ -23,6 +23,17 @@ export default {
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
     async usernameBul() {
       const token = localStorage.getItem("token");
 
@@ -34,19 +45,16 @@ export default {
         this.username = decodedToken.username;
 
         // Kullanıcı adını kullanabilirsiniz
-        console.log("Kullanıcı Adı: ", this.username);
       } else {
         // Token bulunamadı veya localStorage'da saklanmamış
-        console.log("Token bulunamadı.");
       }
     },
     async getPostsFromServer() {
       try {
-        const response = await axios.get("http://localhost:3000/sorular");
+        const response = await axiosInstance.get(
+          "http://localhost:3000/sorular"
+        );
         this.soruList = response.data;
-
-        console.log("Sorular başarıyla alındı");
-        loader.value(true);
       } catch (error) {
         console.error("sorulist" + error);
       }
@@ -58,20 +66,21 @@ export default {
     },
     async soruSil(itemToDelete) {
       try {
-        const requestData = {
-          username: this.username,
-          // Diğer gerekli verileri de ekleyebilirsiniz
-        };
+        // Sadece admin veya soruyu soran kişi silebilir
+        if (
+          this.username !== "admin" &&
+          this.username !== itemToDelete.username
+        ) {
+          box.addError(
+            "Üzgünüm",
+            "Bu soruyu sadece öğretmen veya soruyu soran kişi silebilir."
+          );
+          return;
+        }
 
-        const response = await axios.delete(
-          `http://localhost:3000/sorular/${itemToDelete._id}`,
-          {
-            data: {
-              username: this.username,
-            },
-          }
+        const response = await axiosInstance.delete(
+          `http://localhost:3000/sorular/${itemToDelete._id}`
         );
-        box.addSuccess("Tebrikler", "Soru Silme İşlemi Başarılı!");
 
         this.user.sorulanSoru--;
 
@@ -80,7 +89,6 @@ export default {
         box.addSuccess("Tebrikler", "Soru Silme İşlemi Başarılı!");
       } catch (error) {
         box.addError("Üzgünüm", "Bir Hata Oluştu!");
-
         console.error("Soru silme hatası:", error);
       }
     },
@@ -104,6 +112,7 @@ export default {
 <style>
 .soru-resim {
   margin: 0px auto;
+  height: 250px;
 }
 </style>
 <template>
@@ -114,12 +123,12 @@ export default {
           <img
             src="image/person.png"
             alt="person"
-            class="w-[8%] rounded-[50%]"
+            class="w-[8%] rounded-[50%] max-sm:w-[32px]"
           />
           <RouterLink :to="`/sinif-uyeleri/${soru.username}`">
-            <span class="text-body-color font-bold">{{
-              soru.username
-            }}</span></RouterLink
+            <span class="text-body-color font-bold"
+              >{{ soru.username }}
+            </span></RouterLink
           >
           <p class="text-text-color">tarafından</p>
         </div>
@@ -132,24 +141,28 @@ export default {
             </div>
           </div>
           <div id="soru-tarih">
-            <span class="text-text-color">{{ soru.createdAt }}</span>
+            <span class="text-text-color">{{
+              formatTarih(soru.createdAt)
+            }}</span>
           </div>
         </div>
       </div>
       <div id="soru-icerigi" class="flex flex-col gap-4">
         <div id="soru-basligi">
-          <h2 class="text-body-color">{{ soru.soruBasligi }}</h2>
+          <h2 class="text-body-color max-sm:text-left">
+            {{ soru.soruBasligi }}
+          </h2>
         </div>
         <div id="soru-icerigi">
-          <p class="text-text-color">
+          <p class="text-text-color max-sm:text-left">
             {{ soru.soruAciklamasi }}
           </p>
         </div>
         <div id="soru-resmi">
           <img
             class="soru-resim"
-            :src="'http://localhost:3000/image/' + soru.imageUrl"
-            :alt="soru.title"
+            :src="soru.imageUrl"
+            :alt="soru.soruBasligi"
           />
         </div>
       </div>

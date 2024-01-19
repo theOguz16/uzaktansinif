@@ -8,7 +8,7 @@ import konuListesi from "@/data/konu.json";
         Soru Sor
       </h1>
     </div>
-    <form @submit.prevent="createSurvey">
+    <form @submit.prevent="submitForm">
       <div id="soru-olustur" class="flex flex-col gap-4 py-8 p-24 max-sm:p-0">
         <div>
           <InputText
@@ -37,7 +37,7 @@ import konuListesi from "@/data/konu.json";
             class="hidden"
             ref="file"
             type="file"
-            @change="onChange($event)"
+            @change="uploadFile($event)"
           />
           <button
             class="btn btn-outline-secondary text-text-color max-sm:flex"
@@ -63,7 +63,6 @@ import konuListesi from "@/data/konu.json";
           <Loader v-if="loader" />
 
           <InputButton
-            @click="soruOlustur"
             class="bg-dark-purple w-full outline-none"
             type="submit"
             text="Soru Gönder"
@@ -74,13 +73,12 @@ import konuListesi from "@/data/konu.json";
   </div>
 </template>
 <script>
-//ınput button da bu kod da var @click="reset"
 import { eventBus } from "@/main.js";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
 import box from "@/store/box.js";
 import Loader from "@/components/global/Loader.vue";
 import { ref } from "vue";
+import axiosInstance from "@/lib/axios";
 
 const loader = ref(false);
 
@@ -102,24 +100,17 @@ export default {
         username: null,
         token: null,
       },
+
+      formData: null,
     };
   },
 
   methods: {
-    onChange(event) {
-      let data = new FormData();
-      let file = event.target.files[0];
+    uploadFile(event) {
+      this.formData = new FormData();
+      const file = event.target.files[0];
 
-      data.append("name", "my-file");
-      data.append("file", file);
-
-      let config = {
-        header: {
-          "Content-Type": "multipart/form-data",
-        },
-      };
-
-      axios.post("/test", data, config).then((response) => {});
+      this.formData.append("file", file);
     },
 
     soruOlustur() {
@@ -128,42 +119,37 @@ export default {
       }
     },
 
-    async createSurvey() {
-      // Token'ı localStorage'dan alın
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        // Token varsa, çözme işlemine başlayabilirsiniz
-        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
-
-        // Token içindeki verilere erişin
-        this.username = decodedToken.username;
-
-        // Kullanıcı adını kullanabilirsiniz
-        console.log("Kullanıcı Adı:", this.username);
-      } else {
-        // Token bulunamadı veya localStorage'da saklanmamış
-        console.log("Token bulunamadı.");
-      }
+    async submitForm() {
       try {
+        this.soruOlustur();
         loader.value = true; // Start the loader
-        const response = await axios.post("http://localhost:3000/soru-ekle", {
-          title: this.soru.title,
-          explain: this.soru.explain,
-          konuListesi: this.soru.konuListesi,
-          img: this.soru.img,
-          likeCount: this.soru.likeCount,
-          isLiked: this.soru.isLiked,
-          yorumCount: this.soru.yorumCount,
-          isCommanted: this.soru.isCommanted,
-          username: this.username,
-          token: localStorage.getItem("token"),
-        });
-        this.questions.push(response.data);
-        box.addSuccess("Tebrikler", "Soru Oluşturma İşlemi Başarılı!");
-        return (loader.value = false);
 
-        // this.reset();
+        this.formData.append("title", this.soru.title);
+        this.formData.append("explain", this.soru.explain);
+        this.formData.append("konuListesi", this.soru.konuListesi);
+        this.formData.append("imgUrl", this.soru.img);
+        this.formData.append("likeCount", this.soru.likeCount);
+        this.formData.append("isLiked", this.soru.isLiked);
+        this.formData.append("yorumCount", this.soru.yorumCount);
+        this.formData.append("isCommanted", this.soru.isCommanted);
+
+        // this.formData.append("username", this.username);
+        this.formData.append("token", localStorage.getItem("token"));
+
+        const response = await axiosInstance.post(
+          "http://localhost:3000/soru-ekle",
+          this.formData
+        );
+
+        this.questions.push(response.data);
+
+        box.addSuccess("Tebrikler", "Soru Oluşturma İşlemi Başarılı!");
+
+        this.resetSoru();
+
+        loader.value = false;
+
+        this.fetchQuestions();
       } catch (error) {
         box.addError("Üzgünüm", "Bir Hata Oluştu!");
 
@@ -172,28 +158,28 @@ export default {
         loader.value = false; // Stop the loader regardless of success or failure
       }
     },
+    resetSoru() {
+      this.soru = {
+        konuListesi: null,
+        title: null,
+        explain: null,
+        img: null,
+        likeCount: 0,
+        isLiked: false,
+        yorumCount: 0,
+        isCommanted: false,
+      };
+    },
     async fetchQuestions() {
       try {
-        const response = await axios.get("http://localhost:3000/soru-ekle");
+        const response = await axiosInstance.get(
+          "http://localhost:3000/soru-ekle"
+        );
         this.questions = response.data;
       } catch (error) {
         console.error(error);
       }
     },
-    // reset() {
-    //   this.soru = {
-    //     konuListesi: null,
-    //     title: null,
-    //     explain: null,
-    //     img: null,
-    //     likeCount: 0,
-    //      isLiked: false,
-    //     yorumCount: 0,
-    //      isCommanted: false,
-
-    //     yorumlar: [],
-    //   };
-    // },
   },
   created() {
     this.fetchQuestions();

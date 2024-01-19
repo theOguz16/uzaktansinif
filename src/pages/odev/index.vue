@@ -1,7 +1,6 @@
 <script>
 import konuListesi from "@/data/konu.json";
 import kitapListesi from "@/data/kitaplar.json";
-import axios from "axios";
 import { eventBus } from "@/main.js";
 import jwt_decode from "jwt-decode";
 import axiosInstance from "@/lib/axios";
@@ -26,6 +25,17 @@ export default {
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
     async createOdev() {
       const token = localStorage.getItem("token");
 
@@ -60,16 +70,25 @@ export default {
 
         this.odevListe.push(response.data);
         this.fetchOdevler();
-
-        // this.reset();
+        this.reset();
       } catch (error) {
         box.addError("Üzgünüm", "Bir Hata Oluştu!");
         console.error(error);
       }
     },
+    reset() {
+      this.odevEkle = {
+        text: "",
+        date: "",
+        konu: "",
+        kitap: "",
+        username: "",
+        token: "",
+      };
+    },
     async removeTodo(itemToDelete) {
       try {
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `http://localhost:3000/odev/${itemToDelete._id}`
         );
 
@@ -97,7 +116,6 @@ export default {
           "http://localhost:3000/odev/username"
         );
         this.usernameList = response.data;
-        // console.log(this.usernameList);
       } catch (error) {
         console.error(error);
       }
@@ -106,7 +124,6 @@ export default {
       if (this.odevEkle.text !== null) {
         eventBus.$emit("odevEklendi", this.odevEkle);
       }
-      // this.getOdevlerFromServer();
     },
   },
   created() {
@@ -178,7 +195,7 @@ export default {
           ></InputText>
           <InputDate type="date" v-model="odevEkle.date"></InputDate>
         </div>
-        <div>
+        <div class="max-sm:w-[55%]">
           <ul>
             <li class="bg-white w-full p-2 mb-4" v-for="odev in odevListe">
               <div class="flex items-center justify-center gap-2">
@@ -201,11 +218,14 @@ export default {
                   </div>
                   <div class="flex flex-col gap-1">
                     <span>Ödev Teslim Tarihi</span>
-                    <span class="text-text-color">{{ odev.odevTarihi }}</span>
+                    <span class="text-text-color">{{
+                      formatTarih(odev.odevTarihi)
+                    }}</span>
                   </div>
                 </div>
               </div>
               <button
+                v-if="this.user?.role === 'Teacher'"
                 class="bg-dark-pink text-white rounded p-2 w-full text-center"
                 @click="removeTodo(odev)"
               >

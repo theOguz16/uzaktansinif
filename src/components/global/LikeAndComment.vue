@@ -46,7 +46,7 @@ export default {
     },
     async yorumCounter() {
       try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           "http://localhost:3000/comment-counter",
           {
             soruBasligi: this.soru.soruBasligi,
@@ -71,14 +71,14 @@ export default {
         this.commentClicked = true;
       }
     },
-    likeCounter(soru) {
-      soru.isLiked = !soru.isLiked;
-      if (soru.isLiked) {
-        parseInt(soru.likeCount++);
-        soru.isLiked = true;
+    likeCounter() {
+      this.isLiked = !this.isLiked;
+      if (this.isLiked) {
+        parseInt(this.likeCount++);
+        this.isLiked = true;
       } else {
-        parseInt(soru.likeCount--);
-        soru.isLiked = false;
+        parseInt(this.likeCount--);
+        this.isLiked = false;
       }
     },
   },

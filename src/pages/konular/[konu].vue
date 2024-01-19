@@ -1,5 +1,5 @@
 <script>
-import axios from "axios";
+import axiosInstance from "@/lib/axios";
 import SoruSor from "@/components/global/SoruSor.vue";
 import SoruListesi from "@/components/global/SoruListesi.vue";
 import CanliDers from "@/components/sidebar/CanliDers.vue";
@@ -26,9 +26,20 @@ export default {
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
     async getKategoriler() {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `http://localhost:3000/sorular/konular/${this.$route.params.konu}`
         );
         this.sorular = response.data;
@@ -38,7 +49,7 @@ export default {
     },
     async soruSil(itemToDelete) {
       try {
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `http://localhost:3000/sorular/${itemToDelete._id}`,
           {}
         );
@@ -67,13 +78,13 @@ export default {
   <div
     class="container mt-6 flex gap-8 items-start justify-center flex-row max-sm:p-4 max-sm:flex-col max-sm:justify-center max-sm:items-center max-sm:text-center max-lg:flex-col"
   >
-    <div class="w-[50%]">
+    <div class="w-[50%] max-sm:w-full">
       <CanliDers></CanliDers>
       <Kategoriler></Kategoriler>
     </div>
     <div class="w-full">
       <div v-for="soru in sorular">
-        <div class="bg-white flex flex-col gap-4 p-8 mb-10">
+        <div class="bg-white flex flex-col gap-4 p-8 mb-10 max-sm:text-left">
           <div id="soru-header" class="flex items-center justify-between">
             <div id="soru-paylasan" class="flex items-center gap-2">
               <img
@@ -93,7 +104,9 @@ export default {
                 </div>
               </div>
               <div id="soru-tarih">
-                <span class="text-text-color">{{ soru.createdAt }}</span>
+                <span class="text-text-color">{{
+                  formatTarih(soru.createdAt)
+                }}</span>
               </div>
             </div>
           </div>
@@ -109,8 +122,8 @@ export default {
             <div id="soru-resmi">
               <img
                 class="soru-resim"
-                :src="'http://localhost:3000/image/' + soru.imageUrl"
-                :alt="soru.title"
+                :src="soru.imageUrl"
+                :alt="soru.soruBasligi"
               />
             </div>
           </div>
@@ -123,7 +136,7 @@ export default {
         </div>
       </div>
     </div>
-    <div class="">
+    <div class="max-sm:w-full">
       <Takvim
         class="mb-6 max-lg:items-center max-lg:flex max-lg:justify-center"
       ></Takvim>

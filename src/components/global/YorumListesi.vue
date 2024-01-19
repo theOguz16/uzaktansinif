@@ -1,9 +1,10 @@
 <script>
 import Yorum from "./Yorum.vue";
-import { eventBus } from "../../main.js";
+import { eventBus } from "@/main.js";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 import box from "@/store/box.js";
+import axiosInstance from "@/lib/axios";
 
 export default {
   props: {
@@ -24,6 +25,17 @@ export default {
     };
   },
   methods: {
+    formatTarih(tarih) {
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      };
+      return new Date(tarih).toLocaleString("tr-TR", options);
+    },
     async usernameBul() {
       const token = localStorage.getItem("token");
 
@@ -35,77 +47,46 @@ export default {
         this.username = decodedToken.username;
 
         // Kullanıcı adını kullanabilirsiniz
-        console.log("Kullanıcı Adı: ", this.username);
       } else {
         // Token bulunamadı veya localStorage'da saklanmamış
-        console.log("Token bulunamadı.");
       }
     },
     async getYorumlarFromServer() {
       try {
-        const soruID = this.soru._id; // Soru kimliğini alın
-        const response = await axios.get(
+        const soruID = this.soru._id;
+        const response = await axiosInstance.get(
           `http://localhost:3000/soru/${soruID}/yorumlar`
         );
-        const yorumlar = response.data; // Sunucudan gelen veriler
+        const yeniYorumlar = response.data;
 
-        // Eğer sunucudan gelen veri bir dizi değilse, boş bir dizi olarak atayın
-        this.yorumList = Array.isArray(yorumlar) ? yorumlar : [];
-
-        // Geçerli yorumları filtrele
-        this.yorumList = this.yorumList.filter((yorum) => yorum && yorum._id);
-
-        // Yorumlar için döngüyü başlatın
-        for (const yorum of this.yorumList) {
-          // Diğer işlemler...
-          if (!yorum || !yorum._id) {
-            console.error("Geçersiz yorum nesnesi veya _id değeri:", yorum);
-            continue;
-          }
-
-          // Yorumun kimliğini alın
-          const yorumID = yorum._id;
-
-          // Yorumun ayrıntılarını alın
-          const yorumDetay = await axios.get(
-            `http://localhost:3000/yorumlar/${yorumID}`
+        for (const yeniYorum of yeniYorumlar) {
+          const mevcutYorum = this.yorumList.find(
+            (yorum) => yorum._id === yeniYorum._id
           );
 
-          // Yorumun ayrıntılarını güncelleyin
-          yorum.commentExplain = yorumDetay.data.commentExplain;
-          yorum.likeCount = yorumDetay.data.likeCount;
-          yorum.questionCount = yorumDetay.data.questionCount;
-          yorum.isLiked = yorumDetay.data.isLiked;
-          yorum.isQuestion = yorumDetay.data.isQuestion;
-          yorum.greenBg = yorumDetay.data.greenBg;
-          yorum.blueBg = yorumDetay.data.blueBg;
-          yorum.imageUrl = yorumDetay.data.img;
+          if (!mevcutYorum) {
+            // Yeni yorumu yerel veri listesine ekleyin
+            this.yorumList.push(yeniYorum);
+          } else {
+            // Yorum zaten yerel veri listesinde varsa, sadece güncelleme yapın
+            mevcutYorum.commentExplain = yeniYorum.commentExplain;
+            mevcutYorum.likeCount = yeniYorum.likeCount;
+            mevcutYorum.questionCount = yeniYorum.questionCount;
+            mevcutYorum.isLiked = yeniYorum.isLiked;
+            mevcutYorum.isQuestion = yeniYorum.isQuestion;
+            mevcutYorum.greenBg = yeniYorum.greenBg;
+            mevcutYorum.blueBg = yeniYorum.blueBg;
+            mevcutYorum.imageUrl = yeniYorum.img;
+          }
         }
       } catch (error) {
         console.error("Yorum ayrıntılarını alma hatası:", error);
       }
     },
-    async yorumBegen(yorum) {
-      try {
-        const response = await axios.post("http://localhost:3000/yorum-begen", {
-          commentExplain: yorum.commentExplain,
-        });
 
-        // Beğeni işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
-        // Örneğin:
-        yorum.likeCount = response.data.likeCount;
-        yorum.isLiked = response.data.isLiked;
-
-        box.addSuccess("Tebrikler", "Yorum Beğenme İşlemi Başarılı!");
-      } catch (error) {
-        box.addError("Üzgünüm", "Bir Hata Oluştu!");
-
-        console.error(error);
-      }
-    },
     async questionBegen(yorum) {
       try {
-        const response = await axios.post(
+        const response = await axiosInstance.post(
           "http://localhost:3000/question-begen",
           {
             commentExplain: yorum.commentExplain,
@@ -122,56 +103,80 @@ export default {
         console.error(error);
       }
     },
+    async yorumBegen(yorum) {
+      try {
+        const response = await axiosInstance.post(
+          "http://localhost:3000/yorum-begen",
+          {
+            commentExplain: yorum.commentExplain,
+          }
+        );
+
+        // Beğeni işlemi sonrası cevaptan gelen veriyi kullanabilirsiniz
+        // Örneğin:
+        yorum.likeCount = response.data.likeCount;
+        yorum.isLiked = response.data.isLiked;
+        box.addSuccess("Tebrikler", "Yorum Beğenme İşlemi Başarılı!");
+      } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
+        console.error(error);
+      }
+    },
 
     async yorumSil(yorum) {
       try {
+        // Sadece admin veya soruyu soran kişi silebilir
         const requestData = {
           username: this.username,
         };
+        if (this.username !== "admin" && this.username !== yorum.username) {
+          box.addError(
+            "Üzgünüm",
+            "Bu yorumu sadece öğretmen veya soruyu soran kişi silebilir."
+          );
+          return;
+        }
 
-        const response = await axios.delete(
+        const response = await axiosInstance.delete(
           `http://localhost:3000/yorumlar/${yorum._id}`,
           {
             data: {
               username: this.username,
+              soruID: this.soruID,
             },
           }
         );
-        box.addSuccess("Tebrikler", "Yorum Silme İşlemi Başarılı!");
-        this.user.sorulanSoru--;
 
-        // Başarılı yanıt alındığında, itemToDelete'i frontend'den kaldırabilirsiniz.
         this.yorumList = this.yorumList.filter((yorum) => yorum !== yorum);
+        box.addSuccess("Tebrikler", "Yorum Silme İşlemi Başarılı!");
       } catch (error) {
         box.addError("Üzgünüm", "Bir Hata Oluştu!");
-
         console.error("Yorum silme hatası:", error);
       }
     },
     likeCounter(yorum) {
       yorum.isLiked = !yorum.isLiked;
+      yorum.greenBg = !yorum.greenBg;
+
       if (yorum.isLiked) {
-        yorum.greenBg = !yorum.greenBg;
-        parseInt(yorum.likeCount++);
-        yorum.isLiked = true;
+        yorum.likeCount++;
       } else {
-        yorum.greenBg = !yorum.greenBg;
-        parseInt(yorum.likeCount--);
-        yorum.isLiked = false;
+        yorum.likeCount--;
       }
     },
+
     questionCounter(yorum) {
       yorum.isQuestion = !yorum.isQuestion;
+      yorum.blueBg = !yorum.blueBg;
+
       if (yorum.isQuestion) {
-        yorum.blueBg = !yorum.blueBg;
-        parseInt(yorum.questionCount++);
-        yorum.isQuestion = true;
+        yorum.questionCount++;
       } else {
-        yorum.blueBg = !yorum.blueBg;
-        parseInt(yorum.questionCount--);
-        yorum.isQuestion = false;
+        yorum.questionCount--;
       }
     },
+
     getToday() {
       const date = new Date();
       this.today = date.toLocaleDateString();
@@ -181,7 +186,7 @@ export default {
   mounted() {
     setInterval(() => {
       this.getYorumlarFromServer(); // Belirli aralıklarla verileri güncelle
-    }, 10000); // Örnek: 1 dakikada bir güncelle --> websocket veya loader kullan
+    }, 60000); // Örnek: 1 dakikada bir güncelle --> websocket veya loader kullan
     this.getToday();
   },
   created() {
@@ -210,26 +215,32 @@ export default {
           <img
             src="image/person.png"
             alt="person"
-            class="w-[8%] rounded-[50%]"
+            class="w-[8%] rounded-[50%] max-sm:w-[32px]"
           />
-          <span class="text-body-color font-bold">{{ yorum.username }}</span>
+          <RouterLink :to="`/sinif-uyeleri/${yorum.username}`">
+            <span class="text-body-color font-bold"
+              >{{ yorum.username }}
+            </span></RouterLink
+          >
           <p class="text-text-color">tarafından</p>
         </div>
-        <div id="soru-onay mb-2">
+        <div id="soru-onay ">
           <div
-            class="flex items-center mr-4 cursor-pointer max-sm:items-left text-right"
+            class="flex items-center mr-4 cursor-pointer max-sm:items-right text-right max-sm:relative max-sm:left-[7.5rem] max-sm:top-[0.5rem]"
           >
             <fai @click="yorumSil(yorum)" icon="trash"></fai>
           </div>
         </div>
         <div>
-          <span class="text-text-color">{{ soru.createdAt }}</span>
+          <span class="text-text-color">{{
+            formatTarih(yorum.createdAt)
+          }}</span>
         </div>
       </div>
       <div id="soru-resmi">
         <img
-          class="soru-resim my-4"
-          :src="yorum.img"
+          class="soru-resim"
+          :src="yorum.imageUrl"
           :alt="yorum.commentExplain"
         />
       </div>

@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import box from "@/store/box.js";
 
 export default {
   methods: {
@@ -9,15 +10,22 @@ export default {
 
       // Sunucuya çıkış isteği gönder (isteğe bağlı)
       try {
-        const response = await axios.post("http://localhost:3000/logout");
+        const response = await axiosInstance.post(
+          "http://localhost:3000/logout"
+        );
 
         if (response.status === 200) {
           // Çıkış başarılı
           console.log("Çıkış başarılı.");
+          box.addSuccess("Tebrikler", "Çıkış İşlemi Başarılı!");
         } else {
+          box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
           console.error("Çıkış sırasında bir hata oluştu.");
         }
       } catch (error) {
+        box.addError("Üzgünüm", "Bir Hata Oluştu!");
+
         console.error("Çıkış sırasında bir hata oluştu:", error);
       }
 

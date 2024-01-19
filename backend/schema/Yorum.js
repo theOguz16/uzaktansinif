@@ -24,6 +24,9 @@ const YorumSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isLikedUsers: [],
+  isQuestionUsers: [],
+
   questionCount: {
     type: Number,
     default: 0,
@@ -43,6 +46,9 @@ const YorumSchema = new Schema({
     type: String,
   },
   token: {
+    type: String,
+  },
+  imageUrl: {
     type: String,
   },
   yorumlar: [

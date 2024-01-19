@@ -126,9 +126,8 @@ const genderList = {
 </template>
 <script>
 import { eventBus } from "@/main.js";
-import axios from "axios";
 import box from "@/store/box.js";
-
+import axios from "axios";
 export default {
   data() {
     return {

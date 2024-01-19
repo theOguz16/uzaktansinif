@@ -15,9 +15,12 @@ export default {
   methods: {
     async createLink() {
       try {
-        const response = await axios.post("http://localhost:3000/api/link", {
-          link: this.link,
-        });
+        const response = await axiosInstance.post(
+          "http://localhost:3000/api/link",
+          {
+            link: this.link,
+          }
+        );
         console.log("Link oluşturuldu veya güncellendi:", response.data);
         box.addSuccess("Tebrikler", "Canlı Ders Oluşturma İşlemi Başarılı!");
       } catch (error) {
@@ -31,8 +34,9 @@ export default {
 
     async getLink() {
       try {
-        const response = await axios.get("http://localhost:3000/api/link");
-        console.log("Link getirildi:", response.data);
+        const response = await axiosInstance.get(
+          "http://localhost:3000/api/link"
+        );
         this.link = response.data.link;
       } catch (error) {
         box.addError("Üzgünüm", "Bir Hata Oluştu!");
@@ -67,12 +71,10 @@ export default {
   async mounted() {
     setInterval(() => {
       this.getLink();
-      console.log(this.getLink());
-    }, 10000);
+    }, 60000);
     const result = await axiosInstance.get("http://localhost:3000/canliders");
 
     this.user = result.data.user;
-    console.log(this.user);
   },
 };
 </script>

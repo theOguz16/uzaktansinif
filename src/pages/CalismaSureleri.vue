@@ -1,11 +1,12 @@
 <script>
 import axiosInstance from "@/lib/axios";
-import axios from "axios";
+import jwt_decode from "jwt-decode";
 
 export default {
   data() {
     return {
       users: [],
+      username: "",
     };
   },
   methods: {
@@ -23,20 +24,44 @@ export default {
     },
     async getUsers() {
       try {
-        const response = await axios.get(`http://localhost:3000/register/time`);
+        const response = await axiosInstance.get(
+          `http://localhost:3000/register/time`
+        );
 
         this.users = response.data;
       } catch (error) {
         console.error("user getirme hatası:", error);
       }
     },
+    async userKendiKontrol() {
+      // Token'ı localStorage'dan alın
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        // Token varsa, çözme işlemine başlayabilirsiniz
+        const decodedToken = jwt_decode(token); // jwt_decode, token'ı çözmek için kullanılan bir fonksiyon
+
+        // Token içindeki verilere erişin
+        this.username = decodedToken.username;
+
+        // Kullanıcı adını kullanabilirsiniz
+      } else {
+        console.log("hata");
+      }
+    },
+    async goProfile() {
+      await this.userKendiKontrol(); // userKendiKontrol tamamlanana kadar bekleyin
+      this.$router.push("/profile");
+    },
   },
   created() {
     this.getUsers();
+    this.userKendiKontrol();
   },
   async mounted() {
     setInterval(() => {
       this.getUsers();
+      this.userKendiKontrol();
     }, 10000); // Örnek: 1 dakikada bir güncelle --> websocket veya loader kullan
   },
 };
@@ -51,6 +76,20 @@ export default {
       >
       <li v-for="user in users" class="border-b-2 px-6 py-6">
         <RouterLink
+          v-if="this.username == user.username"
+          class="items-center font-bold text-sm text-theme-primary transition-all hover:text-dark-pink flex gap-4"
+          :to="`/profile`"
+        >
+          <img
+            class="w-10 h-10 rounded-[50%]"
+            src="image/person.png "
+            alt="user-profile-image"
+          />
+
+          {{ user.name }} {{ user.surname }}
+        </RouterLink>
+        <RouterLink
+          v-else
           class="items-center font-bold text-sm text-theme-primary transition-all hover:text-dark-pink flex gap-4"
           :to="`/sinif-uyeleri/${user.username}`"
         >
