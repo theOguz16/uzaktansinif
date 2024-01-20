@@ -1,0 +1,26 @@
+version: '3'
+services:
+  nodejs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.nodejs
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+
+  vuejs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.vuejs
+    ports:
+      - "5173:5173"
+    depends_on:
+      - nodejs-app
+
+  mongodb:
+    build:
+      context: .
+      dockerfile: Dockerfile.mongodb
+    ports:
+      - "27017:27017"

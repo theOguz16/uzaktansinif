@@ -184,7 +184,7 @@ function authenticateJWT(req, res, next) {
 }
 
 const { MongoClient } = require("mongodb");
-const uri = "mongodb://localhost:27017/uzaktansinif"; // MongoDB URI
+const uri = "mongodb://mongodb:27017/uzaktansinif"; // MongoDB URI
 const client = new MongoClient(uri);
 
 // JWT oluşturmak için işlev
@@ -204,7 +204,7 @@ const Link = require("./schema/Link.js");
 //db bağlanma
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/uzaktansinif", {
+mongoose.connect("mongodb://mongodb:27017/uzaktansinif", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
