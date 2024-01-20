@@ -5,12 +5,6 @@ import Pages from "vite-plugin-pages";
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import nodePolyfills from "rollup-plugin-polyfill-node";
 
-module.exports = {
-  devServer: {
-    proxy: "http://localhost:3000", // Uygulamanızın sunucu adresi
-  },
-};
-
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {

@@ -83,7 +83,7 @@ export default {
         >
           <img
             class="w-10 h-10 rounded-[50%]"
-            src="image/person.png "
+            src="@/assets/images/person.png"
             alt="user-profile-image"
           />
 
@@ -96,7 +96,7 @@ export default {
         >
           <img
             class="w-10 h-10 rounded-[50%]"
-            src="image/person.png "
+            src="@/assets/images/person.png"
             alt="user-profile-image"
           />
           {{ user.name }} {{ user.surname }}

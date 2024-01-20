@@ -10,7 +10,7 @@
 //       soruBasligi: "Bu bir örnek soru",
 //       soruAciklamasi: "test",
 //       konu: "vektörler",
-//       imageUrl: "../public/image/soru-ornek.jpeg",
+//
 //     });
 
 //     await Soru.create(yeniSoru);

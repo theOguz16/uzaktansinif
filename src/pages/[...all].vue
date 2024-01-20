@@ -21,7 +21,7 @@
         </ul>
       </div>
       <div class="w-[50%]">
-        <img src="public\image\uzaktansinifbanner.png" alt="404-img" />
+        <img src="@/assets/images/uzaktansinifbanner.png" alt="404-img" />
       </div>
     </div>
   </div>

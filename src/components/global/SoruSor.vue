@@ -31,7 +31,7 @@ import konuListesi from "@/data/konu.json";
         >
           <img
             class="h-24 w-24 text-center mb-2"
-            :src="soru.img == null ? 'image/addimg.png' : soru.img"
+            :src="soru.img == null ? '@/assets/images/person.png' : soru.img"
           />
           <input
             class="hidden"

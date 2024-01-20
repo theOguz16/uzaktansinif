@@ -88,7 +88,7 @@ export default {
           <div id="soru-header" class="flex items-center justify-between">
             <div id="soru-paylasan" class="flex items-center gap-2">
               <img
-                src="image/person.png"
+                src="@/assets/images/person.png"
                 alt="person"
                 class="w-[8%] rounded-[50%]"
               />

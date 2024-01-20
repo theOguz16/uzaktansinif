@@ -19,7 +19,7 @@ const genderList = {
 <template>
   <div class="container flex mx-auto mt-14 bg-white p-0 gap-4">
     <div id="image-container" class="">
-      <img src="image/uzaktansinifbanner.png" alt="login-image" />
+      <img src="@/assets/images/uzaktansinifbanner.png" alt="register-image" />
     </div>
     <div
       id="register"

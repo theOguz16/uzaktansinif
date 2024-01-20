@@ -213,7 +213,7 @@ export default {
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <img
-            src="image/person.png"
+            src="@/assets/images/person.png"
             alt="person"
             class="w-[8%] rounded-[50%] max-sm:w-[32px]"
           />

@@ -33,7 +33,7 @@ const genderList = reactive({
           <div class="flex items-center gap-2">
             <div class="shrink-0">
               <img
-                src="/image/person.png"
+                src="@/assets/images/person.png"
                 class="h-16 w-16 object-cover rounded-full"
                 alt="Current profile photo"
               />

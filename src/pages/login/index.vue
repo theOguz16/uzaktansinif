@@ -44,7 +44,7 @@ export default {
   <div>
     <div class="container flex bg-white mt-14 p-0">
       <div id="image-container" class="w-[50%]">
-        <img src="image/uzaktansinifbanner.png" alt="login-image" />
+        <img src="@/assets/images/uzaktansinifbanner.png" alt="login-image" />
       </div>
       <div id="form-container" class="my-auto mx-auto">
         <form @submit.prevent="login" class="flex flex-col gap-4">

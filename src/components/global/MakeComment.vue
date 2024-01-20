@@ -6,7 +6,7 @@
       >
         <img
           class="h-24 w-24 text-center mb-2"
-          :src="yorum.img == null ? 'image/addimg.png' : yorum.img"
+          :src="yorum.img == null ? '@/assets/images/person.png' : yorum.img"
         />
         <input
           class="hidden"

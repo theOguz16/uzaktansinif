@@ -282,7 +282,7 @@ export default {
         >
           <div class="p-2 border-2 border-white rounded-[100%] bg-white">
             <img
-              src="image/person.png"
+              src="@/assets/images/person.png"
               class="rounded-[100%] h-32 w-32 object-cover"
             />
           </div>
@@ -356,7 +356,7 @@ export default {
         <div id="soru-header" class="flex items-center justify-between">
           <div id="soru-paylasan" class="flex items-center gap-2">
             <img
-              src="image/person.png"
+              src="@/assets/images/person.png"
               alt="person"
               class="w-[8%] rounded-[50%]"
             />
