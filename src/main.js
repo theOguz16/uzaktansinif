@@ -24,8 +24,8 @@ import Search from "./components/global/Search.vue";
 import ProfilSideBar from "./components/sidebar/ProfilSideBar.vue";
 
 //font-awesome
-import "@/lib/fontAwesome";
-import "@/lib/fontAwesomeRegular";
+import "./lib/fontAwesome.js";
+import "./lib/fontAwesomeRegular";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const app = createApp(App);

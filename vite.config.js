@@ -21,7 +21,7 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // Uygulamanızın sunucu adresi
+        target: "http://185.114.192.249:5173/", // Hedef API'nin adresi
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
