@@ -156,17 +156,20 @@ export default {
 
     async createUsers() {
       try {
-        const response = await axios.post("http://localhost:3000/register", {
-          username: this.formData.username,
-          name: this.formData.name,
-          surname: this.formData.surname,
-          dateOfBirth: this.formData.dateOfBirth,
-          city: this.formData.city,
-          gender: this.formData.gender,
-          district: this.formData.district,
-          emailAddres: this.formData.emailAddres,
-          password: this.formData.password,
-        });
+        const response = await axios.post(
+          "http://185.114.192.249:3000/register",
+          {
+            username: this.formData.username,
+            name: this.formData.name,
+            surname: this.formData.surname,
+            dateOfBirth: this.formData.dateOfBirth,
+            city: this.formData.city,
+            gender: this.formData.gender,
+            district: this.formData.district,
+            emailAddres: this.formData.emailAddres,
+            password: this.formData.password,
+          }
+        );
 
         this.users.push(response.data);
 
@@ -183,7 +186,9 @@ export default {
     },
     async fetchQuestions() {
       try {
-        const response = await axios.get("http://localhost:3000/register");
+        const response = await axios.get(
+          "http://185.114.192.249:3000/register"
+        );
         this.users = response.data;
       } catch (error) {
         console.error(error);
