@@ -97,7 +97,7 @@ export default {
         this.formData.append("token", localStorage.getItem("token"));
 
         const response = await axiosInstance.post(
-          `http://localhost:3000/soru/${this.soruID}/yorum-ekle`,
+          `http://185.114.192.249:3000/soru/${this.soruID}/yorum-ekle`,
           this.formData
         );
 
@@ -119,7 +119,7 @@ export default {
     async fetchQuestions() {
       try {
         const response = await axiosInstance.get(
-          "http://localhost:3000/yorumlar"
+          "http://185.114.192.249:3000/yorumlar"
         );
         this.yorumlar = response.data;
       } catch (error) {

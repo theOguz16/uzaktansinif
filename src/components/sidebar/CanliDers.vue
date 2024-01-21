@@ -16,7 +16,7 @@ export default {
     async createLink() {
       try {
         const response = await axiosInstance.post(
-          "http://localhost:3000/api/link",
+          "http://185.114.192.249:3000/api/link",
           {
             link: this.link,
           }
@@ -35,7 +35,7 @@ export default {
     async getLink() {
       try {
         const response = await axiosInstance.get(
-          "http://localhost:3000/api/link"
+          "http://185.114.192.249:3000/api/link"
         );
         this.link = response.data.link;
       } catch (error) {
@@ -72,7 +72,9 @@ export default {
     setInterval(() => {
       this.getLink();
     }, 60000);
-    const result = await axiosInstance.get("http://localhost:3000/canliders");
+    const result = await axiosInstance.get(
+      "http://185.114.192.249:3000/canliders"
+    );
 
     this.user = result.data.user;
   },

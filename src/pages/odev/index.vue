@@ -56,7 +56,7 @@ export default {
 
       try {
         const response = await axiosInstance.post(
-          "http://localhost:3000/odev",
+          "http://185.114.192.249:3000/odev",
           {
             username: this.odevEkle.username,
             token: localStorage.getItem("token"),
@@ -89,7 +89,7 @@ export default {
     async removeTodo(itemToDelete) {
       try {
         const response = await axiosInstance.delete(
-          `http://localhost:3000/odev/${itemToDelete._id}`
+          `http://185.114.192.249:3000/odev/${itemToDelete._id}`
         );
 
         this.odevListe = this.odevListe.filter((odev) => odev !== itemToDelete);
@@ -103,7 +103,9 @@ export default {
 
     async fetchOdevler() {
       try {
-        const response = await axiosInstance.get("http://localhost:3000/odev");
+        const response = await axiosInstance.get(
+          "http://185.114.192.249:3000/odev"
+        );
         // this.odevListe = response.data;
         this.odevListe = response.data;
       } catch (error) {
@@ -113,7 +115,7 @@ export default {
     async usernameListCreate() {
       try {
         const response = await axiosInstance.get(
-          "http://localhost:3000/odev/username"
+          "http://185.114.192.249:3000/odev/username"
         );
         this.usernameList = response.data;
       } catch (error) {
@@ -135,7 +137,9 @@ export default {
     }, 10000);
   },
   async mounted() {
-    const result = await axiosInstance.get("http://localhost:3000/canliders");
+    const result = await axiosInstance.get(
+      "http://185.114.192.249:3000/canliders"
+    );
 
     this.user = result.data.user;
 

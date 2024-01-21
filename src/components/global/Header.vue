@@ -59,7 +59,9 @@ export default {
   },
   methods: {},
   async mounted() {
-    const result = await axiosInstance.get("http://localhost:3000/profile");
+    const result = await axiosInstance.get(
+      "http://185.114.192.249:3000/profile"
+    );
 
     this.user = result.data.user;
   },

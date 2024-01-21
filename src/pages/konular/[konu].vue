@@ -40,7 +40,7 @@ export default {
     async getKategoriler() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:3000/sorular/konular/${this.$route.params.konu}`
+          `http://185.114.192.249:3000/sorular/konular/${this.$route.params.konu}`
         );
         this.sorular = response.data;
       } catch (error) {
@@ -50,7 +50,7 @@ export default {
     async soruSil(itemToDelete) {
       try {
         const response = await axiosInstance.delete(
-          `http://localhost:3000/sorular/${itemToDelete._id}`,
+          `http://185.114.192.249:3000/sorular/${itemToDelete._id}`,
           {}
         );
 

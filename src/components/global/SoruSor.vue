@@ -137,7 +137,7 @@ export default {
         this.formData.append("token", localStorage.getItem("token"));
 
         const response = await axiosInstance.post(
-          "http://localhost:3000/soru-ekle",
+          "http://185.114.192.249:3000/soru-ekle",
           this.formData
         );
 
@@ -173,7 +173,7 @@ export default {
     async fetchQuestions() {
       try {
         const response = await axiosInstance.get(
-          "http://localhost:3000/soru-ekle"
+          "http://185.114.192.249:3000/soru-ekle"
         );
         this.questions = response.data;
       } catch (error) {

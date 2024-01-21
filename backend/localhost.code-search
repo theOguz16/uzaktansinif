@@ -1,0 +1,89 @@
+# Query: localhost
+
+48 results - 19 files
+
+src\components\global\Header.vue:
+  62:     const result = await axiosInstance.get("http://185.114.192.249:3000/profile");
+
+src\components\global\LikeAndComment.vue:
+  30:           "http://185.114.192.249:3000/soru-begen",
+  50:           "http://185.114.192.249:3000/comment-counter",
+
+src\components\global\MakeComment.vue:
+  100:           `http://185.114.192.249:3000/soru/${this.soruID}/yorum-ekle`,
+  122:           "http://185.114.192.249:3000/yorumlar"
+
+src\components\global\Search.vue:
+  44:           "http://185.114.192.249:3000/search",
+
+src\components\global\SoruListesi.vue:
+  55:           "http://185.114.192.249:3000/sorular"
+  82:           `http://185.114.192.249:3000/sorular/${itemToDelete._id}`
+
+src\components\global\SoruSor.vue:
+  140:           "http://185.114.192.249:3000/soru-ekle",
+  176:           "http://185.114.192.249:3000/soru-ekle"
+
+src\components\global\YorumListesi.vue:
+   58:           `http://185.114.192.249:3000/soru/${soruID}/yorumlar`
+   90:           "http://185.114.192.249:3000/question-begen",
+  109:           "http://185.114.192.249:3000/yorum-begen",
+  142:           `http://185.114.192.249:3000/yorumlar/${yorum._id}`,
+
+src\components\sidebar\CanliDers.vue:
+  19:           "http://185.114.192.249:3000/api/link",
+  38:           "http://185.114.192.249:3000/api/link"
+  75:     const result = await axiosInstance.get("http://185.114.192.249:3000/canliders");
+
+src\components\sidebar\ProfilSideBar.vue:
+  14:           "http://185.114.192.249:3000/logout"
+
+src\components\sidebar\SinifUyeleri.vue:
+  28:           `http://185.114.192.249:3000/register/time`
+
+src\components\sidebar\Timer.vue:
+  36:         .post("http://185.114.192.249:3000/user/updateTime", {
+  62:       const response = await axiosInstance.get("http://185.114.192.249:3000/profile");
+
+src\pages\CalismaSureleri.vue:
+  28:           `http://185.114.192.249:3000/register/time`
+
+src\pages\konular\[konu].vue:
+  43:           `http://185.114.192.249:3000/sorular/konular/${this.$route.params.konu}`
+  53:           `http://185.114.192.249:3000/sorular/${itemToDelete._id}`,
+
+src\pages\login\index.vue:
+  16:         const response = await axios.post("http://185.114.192.249:3000/login", {
+
+src\pages\odev\index.vue:
+   59:           "http://185.114.192.249:3000/odev",
+   92:           `http://185.114.192.249:3000/odev/${itemToDelete._id}`
+  106:         const response = await axiosInstance.get("http://185.114.192.249:3000/odev");
+  116:           "http://185.114.192.249:3000/odev/username"
+  138:     const result = await axiosInstance.get("http://185.114.192.249:3000/canliders");
+
+src\pages\profile\index.vue:
+   36:             `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+   58:             `http://185.114.192.249:3000/users/${this.user._id}/ayt-net`,
+   84:             `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+  112:             `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+  142:           `http://185.114.192.249:3000/profile/odevler`
+  153:           `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`
+  158:           `http://185.114.192.249:3000/users/${this.user._id}/ayt-net`
+  164:           `http://185.114.192.249:3000/profile/sorular`
+  179:           `http://185.114.192.249:3000/profile/sorular/${itemToDelete._id}`
+  195:           `http://185.114.192.249:3000/profile/odevler/${itemToDelete._id}`
+  212:     const result = await axiosInstance.get("http://185.114.192.249:3000/profile");
+
+src\pages\register\index.vue:
+  159:         const response = await axios.post("http://185.114.192.249:3000/register", {
+  186:         const response = await axios.get("http://185.114.192.249:3000/register");
+
+src\pages\search\[search].vue:
+  42:           `http://185.114.192.249:3000/search/${this.$route.params.search}`
+
+src\pages\sinif-uyeleri\[username].vue:
+  51:           `http://185.114.192.249:3000/profile/odevler/${itemToDelete._id}`
+  64:           `http://185.114.192.249:3000/sinif-uyeleri/${this.$route.params.username}`
+  76:           `http://185.114.192.249:3000/odevler/${this.$route.params.username}`
+  86:           `http://185.114.192.249:3000/sorular/${this.$route.params.username}`

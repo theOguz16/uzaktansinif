@@ -11,7 +11,7 @@ export default {
       // Sunucuya çıkış isteği gönder (isteğe bağlı)
       try {
         const response = await axiosInstance.post(
-          "http://localhost:3000/logout"
+          "http://185.114.192.249:3000/logout"
         );
 
         if (response.status === 200) {

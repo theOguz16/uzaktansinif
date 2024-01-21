@@ -39,7 +39,7 @@ export default {
     async getSearch() {
       try {
         const response = await axiosInstance.get(
-          `http://localhost:3000/search/${this.$route.params.search}`
+          `http://185.114.192.249:3000/search/${this.$route.params.search}`
         );
         this.sorular = response.data;
       } catch (error) {
