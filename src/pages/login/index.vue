@@ -14,7 +14,7 @@ export default {
     async login() {
       try {
         const response = await axios.post(
-          "https://185.114.192.249:3000/login",
+          "https://api.fizikodev.com:3000/login",
           {
             username: this.username,
             password: this.password,

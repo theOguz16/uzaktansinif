@@ -52,7 +52,7 @@ export default {
     async getPostsFromServer() {
       try {
         const response = await axiosInstance.get(
-          "https://185.114.192.249:3000/sorular"
+          "https://api.fizikodev.com:3000/sorular"
         );
         this.soruList = response.data;
       } catch (error) {
@@ -79,7 +79,7 @@ export default {
         }
 
         const response = await axiosInstance.delete(
-          `https://185.114.192.249:3000/sorular/${itemToDelete._id}`
+          `https://api.fizikodev.com:3000/sorular/${itemToDelete._id}`
         );
 
         this.user.sorulanSoru--;

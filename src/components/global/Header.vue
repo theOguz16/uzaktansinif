@@ -60,7 +60,7 @@ export default {
   methods: {},
   async mounted() {
     const result = await axiosInstance.get(
-      "https://185.114.192.249:3000/profile"
+      "https://api.fizikodev.com:3000/profile"
     );
 
     this.user = result.data.user;

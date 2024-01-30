@@ -27,7 +27,7 @@ export default {
     async soruBegen() {
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/soru-begen",
+          "https://api.fizikodev.com:3000/soru-begen",
           {
             soruBasligi: this.soru.soruBasligi,
           }
@@ -47,7 +47,7 @@ export default {
     async yorumCounter() {
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/comment-counter",
+          "https://api.fizikodev.com:3000/comment-counter",
           {
             soruBasligi: this.soru.soruBasligi,
           }

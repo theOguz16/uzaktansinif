@@ -15,7 +15,7 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: "https://185.114.192.249:5173/", // Hedef API'nin adresi
+        target: "https://api.fizikodev.com:5173/", // Hedef API'nin adresi
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

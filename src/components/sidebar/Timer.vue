@@ -33,7 +33,7 @@ export default {
     },
     sendPostRequest() {
       axios
-        .post("https://185.114.192.249:3000/user/updateTime", {
+        .post("https://api.fizikodev.com:3000/user/updateTime", {
           userId: this.user._id,
           newTime: this.user.time,
         })
@@ -60,7 +60,7 @@ export default {
 
     try {
       const response = await axiosInstance.get(
-        "https://185.114.192.249:3000/profile"
+        "https://api.fizikodev.com:3000/profile"
       );
       this.user = response.data.user;
     } catch (error) {

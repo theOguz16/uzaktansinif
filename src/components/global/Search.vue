@@ -41,7 +41,7 @@ export default {
     async handleSearch() {
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/search",
+          "https://api.fizikodev.com:3000/search",
           {
             searchText: this.searchText,
           }

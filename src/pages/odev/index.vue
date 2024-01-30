@@ -56,7 +56,7 @@ export default {
 
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/odev",
+          "https://api.fizikodev.com:3000/odev",
           {
             username: this.odevEkle.username,
             token: localStorage.getItem("token"),
@@ -89,7 +89,7 @@ export default {
     async removeTodo(itemToDelete) {
       try {
         const response = await axiosInstance.delete(
-          `https://185.114.192.249:3000/odev/${itemToDelete._id}`
+          `https://api.fizikodev.com:3000/odev/${itemToDelete._id}`
         );
 
         this.odevListe = this.odevListe.filter((odev) => odev !== itemToDelete);
@@ -104,7 +104,7 @@ export default {
     async fetchOdevler() {
       try {
         const response = await axiosInstance.get(
-          "https://185.114.192.249:3000/odev"
+          "https://api.fizikodev.com:3000/odev"
         );
         // this.odevListe = response.data;
         this.odevListe = response.data;
@@ -115,7 +115,7 @@ export default {
     async usernameListCreate() {
       try {
         const response = await axiosInstance.get(
-          "https://185.114.192.249:3000/odev/username"
+          "https://api.fizikodev.com:3000/odev/username"
         );
         this.usernameList = response.data;
       } catch (error) {
@@ -138,7 +138,7 @@ export default {
   },
   async mounted() {
     const result = await axiosInstance.get(
-      "https://185.114.192.249:3000/canliders"
+      "https://api.fizikodev.com:3000/canliders"
     );
 
     this.user = result.data.user;

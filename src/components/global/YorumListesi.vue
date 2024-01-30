@@ -55,7 +55,7 @@ export default {
       try {
         const soruID = this.soru._id;
         const response = await axiosInstance.get(
-          `https://185.114.192.249:3000/soru/${soruID}/yorumlar`
+          `https://api.fizikodev.com:3000/soru/${soruID}/yorumlar`
         );
         const yeniYorumlar = response.data;
 
@@ -87,7 +87,7 @@ export default {
     async questionBegen(yorum) {
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/question-begen",
+          "https://api.fizikodev.com:3000/question-begen",
           {
             commentExplain: yorum.commentExplain,
           }
@@ -106,7 +106,7 @@ export default {
     async yorumBegen(yorum) {
       try {
         const response = await axiosInstance.post(
-          "https://185.114.192.249:3000/yorum-begen",
+          "https://api.fizikodev.com:3000/yorum-begen",
           {
             commentExplain: yorum.commentExplain,
           }
@@ -139,7 +139,7 @@ export default {
         }
 
         const response = await axiosInstance.delete(
-          `https://185.114.192.249:3000/yorumlar/${yorum._id}`,
+          `https://api.fizikodev.com:3000/yorumlar/${yorum._id}`,
           {
             data: {
               username: this.username,
