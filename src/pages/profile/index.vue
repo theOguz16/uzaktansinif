@@ -33,7 +33,7 @@ export default {
         try {
           // Backend'e TYT netini eklemek için POST isteği gönder
           await axiosInstance.post(
-            `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+            `https://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
             {
               week: this.tytList.length + 1, // Haftayı belirlemek için mevcut hafta sayısını kullanabilirsiniz.
               net: this.tyt,
@@ -55,7 +55,7 @@ export default {
         try {
           // Backend'e TYT netini eklemek için POST isteği gönder
           await axiosInstance.post(
-            `http://185.114.192.249:3000/users/${this.user._id}/ayt-net`,
+            `https://185.114.192.249:3000/users/${this.user._id}/ayt-net`,
             {
               week: this.aytList.length + 1, // Haftayı belirlemek için mevcut hafta sayısını kullanabilirsiniz.
               net: this.ayt,
@@ -81,7 +81,7 @@ export default {
 
           // Sunucuya TYT netini güncellemek için PUT isteği gönderin
           const response = await axiosInstance.put(
-            `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+            `https://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
             {
               week: week,
               net: this.tyt,
@@ -109,7 +109,7 @@ export default {
 
           // Sunucuya TYT netini güncellemek için PUT isteği gönderin
           const response = await axiosInstance.put(
-            `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
+            `https://185.114.192.249:3000/users/${this.user._id}/tyt-net`,
             {
               week: week,
               net: this.tyt,
@@ -139,7 +139,7 @@ export default {
       try {
         //ödevleri çekmece
         const { data } = await axiosInstance.get(
-          `http://185.114.192.249:3000/profile/odevler`
+          `https://185.114.192.249:3000/profile/odevler`
         );
         this.odevler = data.odevler;
       } catch (error) {
@@ -150,18 +150,18 @@ export default {
       try {
         //netleri cekmece
         const tytResponse = await axiosInstance.get(
-          `http://185.114.192.249:3000/users/${this.user._id}/tyt-net`
+          `https://185.114.192.249:3000/users/${this.user._id}/tyt-net`
         );
         this.tytList = tytResponse.data;
 
         const aytResponse = await axiosInstance.get(
-          `http://185.114.192.249:3000/users/${this.user._id}/ayt-net`
+          `https://185.114.192.249:3000/users/${this.user._id}/ayt-net`
         );
         this.aytList = aytResponse.data;
 
         //soruları çekmece
         const { data } = await axiosInstance.get(
-          `http://185.114.192.249:3000/profile/sorular`
+          `https://185.114.192.249:3000/profile/sorular`
         );
         this.sorular = data.sorular;
       } catch (error) {
@@ -176,7 +176,7 @@ export default {
     async soruSil(itemToDelete) {
       try {
         const response = await axiosInstance.delete(
-          `http://185.114.192.249:3000/profile/sorular/${itemToDelete._id}`
+          `https://185.114.192.249:3000/profile/sorular/${itemToDelete._id}`
         );
 
         this.getProfileData();
@@ -192,7 +192,7 @@ export default {
     async removeTodo(itemToDelete) {
       try {
         const response = await axiosInstance.delete(
-          `http://185.114.192.249:3000/profile/odevler/${itemToDelete._id}`
+          `https://185.114.192.249:3000/profile/odevler/${itemToDelete._id}`
         );
 
         this.odevler = this.odevler.filter((odev) => odev !== itemToDelete);
@@ -210,7 +210,7 @@ export default {
     this.getToday();
 
     const result = await axiosInstance.get(
-      "http://185.114.192.249:3000/profile"
+      "https://185.114.192.249:3000/profile"
     );
 
     this.user = result.data.user;

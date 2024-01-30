@@ -33,7 +33,7 @@ export default {
     },
     sendPostRequest() {
       axios
-        .post("http://185.114.192.249:3000/user/updateTime", {
+        .post("https://185.114.192.249:3000/user/updateTime", {
           userId: this.user._id,
           newTime: this.user.time,
         })
@@ -60,7 +60,7 @@ export default {
 
     try {
       const response = await axiosInstance.get(
-        "http://185.114.192.249:3000/profile"
+        "https://185.114.192.249:3000/profile"
       );
       this.user = response.data.user;
     } catch (error) {

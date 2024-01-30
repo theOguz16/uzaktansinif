@@ -13,10 +13,13 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post("http://185.114.192.249:3000/login", {
-          username: this.username,
-          password: this.password,
-        });
+        const response = await axios.post(
+          "https://185.114.192.249:3000/login",
+          {
+            username: this.username,
+            password: this.password,
+          }
+        );
 
         if (response.status === 200) {
           box.addSuccess("Tebrikler", "Giriş Başarılı!");

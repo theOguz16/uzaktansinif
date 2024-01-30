@@ -60,7 +60,7 @@ export default {
   methods: {},
   async mounted() {
     const result = await axiosInstance.get(
-      "http://185.114.192.249:3000/profile"
+      "https://185.114.192.249:3000/profile"
     );
 
     this.user = result.data.user;
