@@ -13,13 +13,10 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post(
-          "https://api.fizikodev.com:3000/login",
-          {
-            username: this.username,
-            password: this.password,
-          }
-        );
+        const response = await axios.post("https://api.fizikodev.com/login", {
+          username: this.username,
+          password: this.password,
+        });
 
         if (response.status === 200) {
           box.addSuccess("Tebrikler", "Giriş Başarılı!");

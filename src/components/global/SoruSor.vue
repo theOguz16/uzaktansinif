@@ -137,7 +137,7 @@ export default {
         this.formData.append("token", localStorage.getItem("token"));
 
         const response = await axiosInstance.post(
-          "https://api.fizikodev.com:3000/soru-ekle",
+          "https://api.fizikodev.com/soru-ekle",
           this.formData
         );
 
@@ -173,7 +173,7 @@ export default {
     async fetchQuestions() {
       try {
         const response = await axiosInstance.get(
-          "https://api.fizikodev.com:3000/soru-ekle"
+          "https://api.fizikodev.com/soru-ekle"
         );
         this.questions = response.data;
       } catch (error) {

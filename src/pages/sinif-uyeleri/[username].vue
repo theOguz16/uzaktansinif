@@ -48,7 +48,7 @@ export default {
       }
       try {
         const response = await axiosInstance.delete(
-          `https://api.fizikodev.com:3000/profile/odevler/${itemToDelete._id}`
+          `https://api.fizikodev.com/profile/odevler/${itemToDelete._id}`
         );
 
         this.odevler = this.odevler.filter((odev) => odev !== itemToDelete);
@@ -61,7 +61,7 @@ export default {
     async getUser() {
       try {
         const response = await axiosInstance.get(
-          `https://api.fizikodev.com:3000/sinif-uyeleri/${this.$route.params.username}`
+          `https://api.fizikodev.com/sinif-uyeleri/${this.$route.params.username}`
         );
         this.users = response.data;
 
@@ -73,7 +73,7 @@ export default {
     async getOdev() {
       try {
         const response = await axiosInstance.get(
-          `https://api.fizikodev.com:3000/odevler/${this.$route.params.username}`
+          `https://api.fizikodev.com/odevler/${this.$route.params.username}`
         );
         this.odevler = response.data;
       } catch (error) {
@@ -83,7 +83,7 @@ export default {
     async getSoru() {
       try {
         const response = await axiosInstance.get(
-          `https://api.fizikodev.com:3000/sorular/${this.$route.params.username}`
+          `https://api.fizikodev.com/sorular/${this.$route.params.username}`
         );
         this.sorular = response.data;
       } catch (error) {

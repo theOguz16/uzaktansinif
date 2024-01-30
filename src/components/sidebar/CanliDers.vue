@@ -16,7 +16,7 @@ export default {
     async createLink() {
       try {
         const response = await axiosInstance.post(
-          "https://api.fizikodev.com:3000/api/link",
+          "https://api.fizikodev.com/api/link",
           {
             link: this.link,
           }
@@ -35,7 +35,7 @@ export default {
     async getLink() {
       try {
         const response = await axiosInstance.get(
-          "https://api.fizikodev.com:3000/api/link"
+          "https://api.fizikodev.com/api/link"
         );
         this.link = response.data.link;
       } catch (error) {
@@ -73,7 +73,7 @@ export default {
       this.getLink();
     }, 60000);
     const result = await axiosInstance.get(
-      "https://api.fizikodev.com:3000/canliders"
+      "https://api.fizikodev.com/canliders"
     );
 
     this.user = result.data.user;

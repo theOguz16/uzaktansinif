@@ -25,7 +25,7 @@ export default {
     async getUsers() {
       try {
         const response = await axiosInstance.get(
-          `https://api.fizikodev.com:3000/register/time`
+          `https://api.fizikodev.com/register/time`
         );
 
         this.users = response.data;

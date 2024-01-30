@@ -59,9 +59,7 @@ export default {
   },
   methods: {},
   async mounted() {
-    const result = await axiosInstance.get(
-      "https://api.fizikodev.com:3000/profile"
-    );
+    const result = await axiosInstance.get("https://api.fizikodev.com/profile");
 
     this.user = result.data.user;
   },

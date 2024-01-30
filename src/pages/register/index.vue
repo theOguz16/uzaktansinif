@@ -160,7 +160,7 @@ export default {
     async createUsers() {
       try {
         const response = await axios.post(
-          "https://api.fizikodev.com:3000/register",
+          "https://api.fizikodev.com/register",
           {
             username: this.formData.username,
             name: this.formData.name,
@@ -189,9 +189,7 @@ export default {
     },
     async fetchQuestions() {
       try {
-        const response = await axios.get(
-          "https://api.fizikodev.com:3000/register"
-        );
+        const response = await axios.get("https://api.fizikodev.com/register");
         this.users = response.data;
       } catch (error) {
         console.error(error);

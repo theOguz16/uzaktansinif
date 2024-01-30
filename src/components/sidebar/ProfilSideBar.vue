@@ -11,7 +11,7 @@ export default {
       // Sunucuya çıkış isteği gönder (isteğe bağlı)
       try {
         const response = await axiosInstance.post(
-          "https://api.fizikodev.com:3000/logout"
+          "https://api.fizikodev.com/logout"
         );
 
         if (response.status === 200) {

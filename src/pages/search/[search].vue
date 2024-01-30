@@ -39,7 +39,7 @@ export default {
     async getSearch() {
       try {
         const response = await axiosInstance.get(
-          `http://api.fizikodev.com:3000/search/${this.$route.params.search}`
+          `http://api.fizikodev.com/search/${this.$route.params.search}`
         );
         this.sorular = response.data;
       } catch (error) {
