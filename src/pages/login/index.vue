@@ -42,8 +42,8 @@ export default {
 </script>
 <template>
   <div>
-    <div class="container flex bg-white mt-14 p-0">
-      <div id="image-container" class="w-[50%]">
+    <div class="container flex bg-white mt-14 p-0 max-sm:flex-col">
+      <div id="image-container" class="w-[50%] max-sm:w-full">
         <img src="@/assets/images/uzaktansinifbanner.png" alt="login-image" />
       </div>
       <div id="form-container" class="my-auto mx-auto">

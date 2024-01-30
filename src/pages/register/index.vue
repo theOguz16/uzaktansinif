@@ -17,7 +17,7 @@ const genderList = {
 };
 </script>
 <template>
-  <div class="container flex mx-auto mt-14 bg-white p-0 gap-4">
+  <div class="container flex mx-auto mt-14 bg-white p-0 gap-4 max-sm:flex-col">
     <div id="image-container" class="">
       <img src="@/assets/images/uzaktansinifbanner.png" alt="register-image" />
     </div>
@@ -26,8 +26,11 @@ const genderList = {
       class="max-w-[560px] mx-auto border-slate-100 rounded-md border p-6 bg-white"
     >
       <h3 class="mb-5 text-dark-purple text-center">Kayıt Ol</h3>
-      <form @submit.prevent="createUsers" class="grid grid-rows-3 gap-5">
-        <div class="flex gap-5">
+      <form
+        @submit.prevent="createUsers"
+        class="grid grid-rows-3 gap-5 max-sm:flex max-sm:flex-col"
+      >
+        <div class="flex gap-5 max-sm:flex-col">
           <InputText
             label="Ad"
             type="text"
@@ -54,7 +57,7 @@ const genderList = {
             required
           />
         </div>
-        <div class="flex gap-5">
+        <div class="flex gap-5 max-sm:flex-col">
           <InputSelect
             :items="cities"
             itemKey="il"
