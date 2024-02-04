@@ -20,5 +20,7 @@ profil ayarları sayfası
 kaydetmeler
 mongodb://185.114.192.249:27017
 
+94.154.34.59 yeni ip
+
 
   
