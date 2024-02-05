@@ -6,8 +6,6 @@ services:
       dockerfile: Dockerfile.nodejs
     ports:
       - "3000:3000"
-    depends_on:
-      - mongodb
 
   vuejs-app:
     build:
