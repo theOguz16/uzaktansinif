@@ -22,5 +22,68 @@ mongodb://185.114.192.249:27017
 
 94.154.34.59 yeni ip
 
+bu gibi testleri et benim attığım komutlarla sonrasını salayım ben sana, çok fazla zamanım gitti hafta içi muhtemelen bakamayacağım :D ben yardımcı olmak istemiştimde hatalar falan çok uzadı
+17:44
+
+şimdi; öncelikle kesinlikle aws bilgilerini kaldırıp .env e ekle. .env github daolmasın, hatta istersen sunucuya kendi github ını ekle veya token ile pull yap, repo nu private yap
+17:44
+
+kaynak kodlarını ve .env dosyalarını görmesinler
+17:44
+
+orda benim düşümcem .env ler kalsa bile repo yu private yap git pull yapacağın zamanda repo ya özel bir token oluşturup istek atarsın
+17:45
+
+repo veya kendi ayarlarından token oluşturabilirsin, oluşturukdan sonra repo nu private a çekersin server içinden de git pull u token ile beraber tetiklersin
+17:46
+
+veya direk sunucuya kendi github bilgilerini ekle git yükledim ben sunucuya
+17:46
+
+mongodb ye de password falan eklemek istersen docker compose dosyasını güncellemen gerekli, orda chatgbt den yardım alabilirsin direk gerekirse bir kaç username password parametresi vardı
+17:47
+
+bunlar önerimdi -- şimdi diğer kısıma gelirsek
+17:48
+
+➜ ~ ssh root@185.114.192.249
+17:48
+
+girdiğin zaman bir password dönecek orda password e gir
+17:48
+
+cd /home komutu ile projenin olduğu dizine gt
+17:48
+
+git*
+17:48
+
+cd uzaktansinif/ ile repo dizinie gir
+17:49
+21 Ocak
+
+dizinine*
+17:49
+
+bu dizinde token lı veya tokensız git pull ile projeyi çek
+17:49
+
+son halini yani
+17:49
+
+docker-compose up -d ile son halini yayına alabilirsin
+17:50
+
+--build e gerekyok , docker-compose up -d tetiklemen yeterli
+17:50
+
+son halini yayına almış olacaksın bu şekilde
+17:51
+
+docker ps ile 3 projenin (mongodb,vue,nodejs) çalışıp çalışmadığını ve portlarını görebilirsin
+17:51
+
+bu şekilde atladığım bişey var mı hocam
+
 
   

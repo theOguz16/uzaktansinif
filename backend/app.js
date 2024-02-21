@@ -184,8 +184,7 @@ function authenticateJWT(req, res, next) {
 }
 
 const { MongoClient } = require("mongodb");
-const uri =
-  "mongodb+srv://ogz:123@fizikodev.uswjnxu.mongodb.net/?retryWrites=true&w=majority"; // MongoDB URI
+const uri = "mongodb://94.154.34.59:27017/"; // MongoDB URI
 const client = new MongoClient(uri);
 
 // JWT oluşturmak için işlev
@@ -205,13 +204,10 @@ const Link = require("./schema/Link.js");
 //db bağlanma
 const mongoose = require("mongoose");
 
-mongoose.connect(
-  "mongodb+srv://ogz:123@fizikodev.uswjnxu.mongodb.net/?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect("mongodb://94.154.34.59:27017/", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const db = mongoose.connection;
 
