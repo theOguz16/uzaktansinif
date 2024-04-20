@@ -99,48 +99,10 @@
       </div>
     </swiper-slide>
     <swiper-slide>
-      <div class="flex items-center justify-center gap-4">
-        <div id="border" class="rounded bg-gray-50">
-          <div
-            class="flex flex-col shadow-md border hover:translate-y-2 duration-300"
-          >
-            <div>
-              <img
-                class="h-48 w-full text-left object-cover"
-                src="../../public/image/ornek-post-1.jpeg"
-                alt="linkedin-post-image"
-              />
-            </div>
-
-            <div class="flex flex-col gap-[10px] p-4">
-              <h3 class="text-[22px]">
-                Şirketimiz Ödül Kazanmıştır {{ index }}
-              </h3>
-              <p
-                v-if="isTruncated"
-                class="font-[500] text-[#757575] text-[16px]"
-              >
-                {{ truncatedContent }}
-              </p>
-              <router-link
-                :to="link"
-                class="mt-4 font-bold flex gap-2 hover:underline decoration-[#757575] duration-300 transform text-[#757575] font-500 text-[16px]"
-                @click="goToLink"
-                target="_blank"
-                >{{ linkText }}
-                <div>
-                  <span>
-                    <font-awesome-icon
-                      class="insta-bg text-white w-[16px] h-[16px] p-[6px] items-center justify-center rounded-sm"
-                      :icon="['fab', 'instagram']"
-                    />
-                  </span>
-                </div>
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div
+        class="elfsight-app-7e13718e-ab56-4dd1-bec1-f546c0d7de9d"
+        data-elfsight-app-lazy
+      ></div>
     </swiper-slide>
     <swiper-slide>
       <div class="flex items-center justify-center gap-4">
