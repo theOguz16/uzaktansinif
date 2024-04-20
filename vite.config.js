@@ -13,13 +13,13 @@ export default defineConfig({
       // https://vitejs.dev/config/server-options.html#server-watch
       usePolling: true,
     },
-    proxy: {
-      "/api": {
-        target: "https://api.fizikodev.com:5173/", // Hedef API'nin adresi
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-    },
+    // proxy: {
+    //   "/api": {
+    //     target: "https://api.fizikodev.com:5173/", // Hedef API'nin adresi
+    //     changeOrigin: true,
+    //     rewrite: (path) => path.replace(/^\/api/, ""),
+    //   },
+    // },
   },
   plugins: [vue(), Pages()],
   optimizeDeps: {

@@ -4,13 +4,13 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     fontFamily: {
-      poppins: ["Poppins", "sans-serif"],
+      montserrat: ["Montserrat", "sans-serif"],
     },
     extend: {
       colors: {
         "theme-main": "#545a64",
         "theme-primary": "#3f4257",
-        "body-bg": "#EDF2F6",
+        "body-bg": "#e6e6e6",
         "body-color": "#757f8f",
         "dark-pink": "#ad4699",
         "dark-purple": "#7334a6",
